@@ -270,6 +270,110 @@
     .combo-text.visible {
       opacity: 1;
     }
+
+    .reset-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 15;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.3);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .reset-btn:hover {
+      color: #ff0050;
+      border-color: rgba(255,0,80,0.4);
+    }
+
+    .reset-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reset-modal.open {
+      display: flex;
+    }
+
+    .reset-box {
+      background: #141414;
+      border: 1px solid rgba(255,0,80,0.3);
+      border-radius: 16px;
+      padding: 32px 40px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(255,0,80,0.15);
+      max-width: 340px;
+      width: 90%;
+    }
+
+    .reset-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: #ff0050;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .reset-sub {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 28px;
+    }
+
+    .reset-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .reset-confirm, .reset-cancel {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 10px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.1s, box-shadow 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .reset-confirm {
+      background: #ff0050;
+      color: #fff;
+    }
+
+    .reset-confirm:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255,0,80,0.5);
+    }
+
+    .reset-cancel {
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .reset-cancel:hover {
+      color: #fff;
+      border-color: rgba(255,255,255,0.5);
+    }
   </style>
 </head>
 <body>
@@ -283,6 +387,19 @@
 
   <div class="btn-wrapper">
     <button class="click-btn" id="clickBtn">HIT IT</button>
+  </div>
+
+  <button class="reset-btn" id="resetBtn">RESET</button>
+
+  <div class="reset-modal" id="resetModal">
+    <div class="reset-box">
+      <div class="reset-title">RESET COUNT?</div>
+      <div class="reset-sub">This will set your clicks back to 0</div>
+      <div class="reset-buttons">
+        <button class="reset-confirm" id="resetConfirm">YEAH, DO IT</button>
+        <button class="reset-cancel" id="resetCancel">NAH, KEEP IT</button>
+      </div>
+    </div>
   </div>
 
   <div class="streak-bar" id="streakBar" style="width: 0%"></div>
@@ -723,6 +840,36 @@
         e.preventDefault();
         btn.click();
       }
+    });
+
+    // Reset with confirmation
+    const resetBtn = document.getElementById('resetBtn');
+    const resetModal = document.getElementById('resetModal');
+    const resetConfirm = document.getElementById('resetConfirm');
+    const resetCancel = document.getElementById('resetCancel');
+
+    resetBtn.addEventListener('click', () => {
+      resetModal.classList.add('open');
+    });
+
+    resetCancel.addEventListener('click', () => {
+      resetModal.classList.remove('open');
+    });
+
+    resetConfirm.addEventListener('click', () => {
+      count = 0;
+      beatStep = 0;
+      streak = 0;
+      localStorage.setItem('phonkClicks', '0');
+      counterEl.textContent = '0';
+      streakBar.style.width = '0%';
+      streakLabel.classList.remove('visible');
+      comboText.classList.remove('visible');
+      resetModal.classList.remove('open');
+    });
+
+    resetModal.addEventListener('click', (e) => {
+      if (e.target === resetModal) resetModal.classList.remove('open');
     });
   </script>
 </body>
