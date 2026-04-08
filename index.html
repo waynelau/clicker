@@ -459,6 +459,31 @@
       color: var(--accent);
       border-color: var(--accent);
     }
+
+    .auto-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      background: transparent;
+      border: 1px solid var(--text-dim);
+      border-radius: 8px;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .auto-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .auto-btn.active {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -475,6 +500,7 @@
   </div>
 
   <div class="top-btns">
+    <button class="auto-btn" id="autoBtn">&#9654; AUTO</button>
     <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
     <button class="reset-btn" id="resetBtn">RESET</button>
   </div>
@@ -959,6 +985,26 @@
 
     resetModal.addEventListener('click', (e) => {
       if (e.target === resetModal) resetModal.classList.remove('open');
+    });
+
+    // Auto-play at 130 BPM (one beat = 60/130 * 1000ms ≈ 462ms)
+    const autoBtn = document.getElementById('autoBtn');
+    let autoInterval = null;
+
+    autoBtn.addEventListener('click', () => {
+      initAudio();
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        autoBtn.classList.remove('active');
+        autoBtn.innerHTML = '&#9654; AUTO';
+      } else {
+        autoBtn.classList.add('active');
+        autoBtn.innerHTML = '&#9646;&#9646; STOP';
+        autoInterval = setInterval(() => {
+          btn.click();
+        }, 462);
+      }
     });
 
     // Theme toggle
