@@ -837,7 +837,7 @@
     // Keyboard support — ignore held keys (repeat events)
     document.addEventListener('keydown', (e) => {
       if (e.repeat) return;
-      if (e.code === 'Space' || e.code === 'Enter') {
+      if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
         btn.click();
       }
