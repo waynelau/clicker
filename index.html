@@ -314,43 +314,77 @@
       }
     }
 
-    // 16-step phonk beat sequence — each click advances one step
+    // 32-step Brazilian phonk batidão sequence
     let beatStep = 0;
 
-    // Dark minor melody notes (Hz) — catchy phonk loop
+    // Melody — dark, hypnotic minor key hook (Cm)
+    // 0 = rest, otherwise freq in Hz
     const melodyPattern = [
-      { note: 311.1, type: 'long' },   // Eb4
-      { note: 0, type: 'rest' },
-      { note: 370.0, type: 'short' },  // F#4
-      { note: 311.1, type: 'short' },  // Eb4
-      { note: 0, type: 'rest' },
-      { note: 415.3, type: 'long' },   // Ab4
-      { note: 370.0, type: 'short' },  // F#4
-      { note: 311.1, type: 'short' },  // Eb4
-      { note: 293.7, type: 'long' },   // D4
-      { note: 0, type: 'rest' },
-      { note: 311.1, type: 'short' },  // Eb4
-      { note: 370.0, type: 'long' },   // F#4
-      { note: 0, type: 'rest' },
-      { note: 415.3, type: 'short' },  // Ab4
-      { note: 370.0, type: 'short' },  // F#4
-      { note: 293.7, type: 'long' },   // D4
+      // Bar 1: descending dark phrase
+      { n: 523.3, d: 0.18 },  // C5
+      { n: 0 },
+      { n: 466.2, d: 0.10 },  // Bb4
+      { n: 392.0, d: 0.10 },  // G4
+      { n: 0 },
+      { n: 349.2, d: 0.18 },  // F4
+      { n: 311.1, d: 0.10 },  // Eb4
+      { n: 0 },
+      // Bar 2: response phrase
+      { n: 349.2, d: 0.12 },  // F4
+      { n: 392.0, d: 0.12 },  // G4
+      { n: 466.2, d: 0.20 },  // Bb4
+      { n: 0 },
+      { n: 392.0, d: 0.10 },  // G4
+      { n: 349.2, d: 0.10 },  // F4
+      { n: 311.1, d: 0.22 },  // Eb4
+      { n: 0 },
+      // Bar 3: climbs back up
+      { n: 311.1, d: 0.10 },  // Eb4
+      { n: 349.2, d: 0.10 },  // F4
+      { n: 392.0, d: 0.18 },  // G4
+      { n: 0 },
+      { n: 466.2, d: 0.14 },  // Bb4
+      { n: 523.3, d: 0.14 },  // C5
+      { n: 466.2, d: 0.10 },  // Bb4
+      { n: 0 },
+      // Bar 4: resolution
+      { n: 523.3, d: 0.10 },  // C5
+      { n: 0 },
+      { n: 466.2, d: 0.10 },  // Bb4
+      { n: 392.0, d: 0.20 },  // G4
+      { n: 0 },
+      { n: 311.1, d: 0.14 },  // Eb4
+      { n: 261.6, d: 0.22 },  // C4
+      { n: 0 },
     ];
 
-    // 808 bass pattern — root notes that hit hard
+    // 808 bass — heavy slides, batidão bounce
     const bassPattern = [
-      155.6, 0, 0, 155.6,
-      0, 103.8, 0, 0,
-      116.5, 0, 116.5, 0,
-      103.8, 0, 0, 103.8
+      // Bar 1
+      130.8, 0, 0, 65.4,  0, 0, 98.0, 0,
+      // Bar 2
+      0, 87.3, 0, 0,  65.4, 0, 0, 65.4,
+      // Bar 3
+      130.8, 0, 0, 0,  87.3, 0, 65.4, 0,
+      // Bar 4
+      0, 0, 98.0, 0,  65.4, 0, 0, 130.8,
     ];
 
-    // Drum pattern: K=kick, H=hat, S=snare, O=open hat
+    // Bass slide amount (semitones down) for each hit
+    const bassSlide = [
+      5, 0, 0, 3,  0, 0, 4, 0,
+      0, 3, 0, 0,  5, 0, 0, 3,
+      5, 0, 0, 0,  3, 0, 4, 0,
+      0, 0, 4, 0,  3, 0, 0, 7,
+    ];
+
+    // Drum pattern: K=kick, H=hat, C=cowbell, S=snare/clap, O=open hat, .=rest
+    // Classic batidão pattern with cowbell
     const drumPattern = [
-      'K', 'H', 'H', 'K',
-      'S', 'H', 'K', 'O',
-      'K', 'H', 'H', 'K',
-      'S', 'O', 'H', 'K'
+      'K', 'H', 'C', 'H',  'S', 'H', 'C', 'K',
+      'H', 'C', 'H', 'K',  'S', 'C', 'H', 'O',
+      'K', 'C', 'H', 'H',  'S', 'H', 'C', 'K',
+      'H', 'C', 'K', 'H',  'S', 'O', 'C', 'K',
     ];
 
     function makeDistortionCurve(amount) {
@@ -363,107 +397,164 @@
     }
 
     function playKick(now) {
+      // Punchy batidão kick
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(150, now);
-      osc.frequency.exponentialRampToValueAtTime(35, now + 0.2);
-      gain.gain.setValueAtTime(0.7, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.3);
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+      gain.gain.setValueAtTime(0.8, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.25);
+
+      // Click transient for punch
+      const click = audioCtx.createOscillator();
+      const cGain = audioCtx.createGain();
+      click.type = 'square';
+      click.frequency.setValueAtTime(1000, now);
+      click.frequency.exponentialRampToValueAtTime(200, now + 0.015);
+      cGain.gain.setValueAtTime(0.3, now);
+      cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      click.connect(cGain); cGain.connect(audioCtx.destination);
+      click.start(now); click.stop(now + 0.02);
     }
 
     function playSnare(now) {
-      // Snare body
+      // Clap-style snare (Brazilian phonk clap)
+      for (let i = 0; i < 3; i++) {
+        const offset = now + i * 0.008;
+        const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.06, audioCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1);
+        const noise = audioCtx.createBufferSource();
+        const nGain = audioCtx.createGain();
+        const bp = audioCtx.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = 2500; bp.Q.value = 0.8;
+        noise.buffer = buf;
+        nGain.gain.setValueAtTime(0.35, offset);
+        nGain.gain.exponentialRampToValueAtTime(0.001, offset + 0.08);
+        noise.connect(bp); bp.connect(nGain); nGain.connect(audioCtx.destination);
+        noise.start(offset);
+      }
+      // Tonal body
       const osc = audioCtx.createOscillator();
-      const oscGain = audioCtx.createGain();
+      const oGain = audioCtx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(200, now);
-      osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
-      oscGain.gain.setValueAtTime(0.4, now);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-      osc.connect(oscGain);
-      oscGain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.1);
-      // Snare noise
-      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1);
-      const noise = audioCtx.createBufferSource();
-      const nGain = audioCtx.createGain();
-      const hp = audioCtx.createBiquadFilter();
-      hp.type = 'highpass'; hp.frequency.value = 3000;
-      noise.buffer = buf;
-      nGain.gain.setValueAtTime(0.25, now);
-      nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-      noise.connect(hp); hp.connect(nGain); nGain.connect(audioCtx.destination);
-      noise.start(now);
+      osc.frequency.setValueAtTime(250, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.06);
+      oGain.gain.setValueAtTime(0.3, now);
+      oGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(oGain); oGain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.08);
     }
 
     function playHiHat(now, open) {
-      const dur = open ? 0.12 : 0.04;
+      const dur = open ? 0.14 : 0.035;
       const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
       const data = buf.getChannelData(0);
       for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1);
       const noise = audioCtx.createBufferSource();
       const gain = audioCtx.createGain();
-      const bp = audioCtx.createBiquadFilter();
-      bp.type = 'bandpass'; bp.frequency.value = open ? 8000 : 10000; bp.Q.value = 1;
+      const hp = audioCtx.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = open ? 7000 : 9000;
       noise.buffer = buf;
-      gain.gain.setValueAtTime(open ? 0.18 : 0.12, now);
+      gain.gain.setValueAtTime(open ? 0.15 : 0.10, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      noise.connect(bp); bp.connect(gain); gain.connect(audioCtx.destination);
+      noise.connect(hp); hp.connect(gain); gain.connect(audioCtx.destination);
       noise.start(now);
     }
 
-    function playBass(now, freq) {
+    function playCowbell(now) {
+      // Two detuned square waves for metallic cowbell tone
+      const freqs = [587.3, 845];
+      freqs.forEach(f => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const bp = audioCtx.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 8;
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(f, now);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(bp); bp.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.08);
+      });
+    }
+
+    function playBass(now, freq, slide) {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const dist = audioCtx.createWaveShaper();
-      dist.curve = makeDistortionCurve(150);
+      dist.curve = makeDistortionCurve(200);
+
+      // Start higher and slide down for that 808 glide
+      const startFreq = freq * Math.pow(2, slide / 12);
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + 0.25);
-      gain.gain.setValueAtTime(0.5, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.frequency.setValueAtTime(startFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq, now + 0.12);
+
+      gain.gain.setValueAtTime(0.6, now);
+      gain.gain.setValueAtTime(0.5, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
       osc.connect(dist); dist.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.3);
+      osc.start(now); osc.stop(now + 0.35);
+
+      // Sub layer for extra weight
+      const sub = audioCtx.createOscillator();
+      const subG = audioCtx.createGain();
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(freq * 0.5, now);
+      subG.gain.setValueAtTime(0.3, now);
+      subG.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      sub.connect(subG); subG.connect(audioCtx.destination);
+      sub.start(now); sub.stop(now + 0.3);
     }
 
-    function playMelody(now, freq, type) {
-      const dur = type === 'long' ? 0.2 : 0.1;
+    function playMelodyNote(now, freq, dur) {
+      // Dark square lead with filter sweep
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(3000, now);
+      filter.frequency.exponentialRampToValueAtTime(800, now + dur);
+      filter.Q.value = 4;
 
-      // Main voice — dark square lead
       osc.type = 'square';
       osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.setValueAtTime(0.12, now + dur * 0.6);
+      gain.gain.setValueAtTime(0.13, now);
+      gain.gain.setValueAtTime(0.11, now + dur * 0.5);
       gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + dur);
 
-      // Detuned layer for thickness
+      // Detuned saw for width
+      const osc2 = audioCtx.createOscillator();
+      const g2 = audioCtx.createGain();
       osc2.type = 'sawtooth';
-      osc2.frequency.setValueAtTime(freq * 1.003, now);
-      gain2.gain.setValueAtTime(0.06, now);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      osc2.connect(gain2); gain2.connect(audioCtx.destination);
+      osc2.frequency.setValueAtTime(freq * 1.005, now);
+      g2.gain.setValueAtTime(0.05, now);
+      g2.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc2.connect(g2); g2.connect(audioCtx.destination);
       osc2.start(now); osc2.stop(now + dur);
+
+      // Octave-up shimmer
+      const osc3 = audioCtx.createOscillator();
+      const g3 = audioCtx.createGain();
+      osc3.type = 'sine';
+      osc3.frequency.setValueAtTime(freq * 2, now);
+      g3.gain.setValueAtTime(0.03, now);
+      g3.gain.exponentialRampToValueAtTime(0.001, now + dur * 0.7);
+      osc3.connect(g3); g3.connect(audioCtx.destination);
+      osc3.start(now); osc3.stop(now + dur);
     }
 
     function playPhonkSound() {
       if (!audioCtx) return;
       const now = audioCtx.currentTime;
-      const step = beatStep % 16;
+      const step = beatStep % 32;
       beatStep++;
 
       // Drums
@@ -472,14 +563,15 @@
       else if (drum === 'S') playSnare(now);
       else if (drum === 'H') playHiHat(now, false);
       else if (drum === 'O') playHiHat(now, true);
+      else if (drum === 'C') playCowbell(now);
 
-      // 808 bass
+      // 808 bass with slide
       const bassFreq = bassPattern[step];
-      if (bassFreq > 0) playBass(now, bassFreq);
+      if (bassFreq > 0) playBass(now, bassFreq, bassSlide[step]);
 
       // Melody
       const mel = melodyPattern[step];
-      if (mel.note > 0) playMelody(now, mel.note, mel.type);
+      if (mel.n > 0) playMelodyNote(now, mel.n, mel.d);
     }
 
     function spawnParticles(x, y) {
