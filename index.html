@@ -968,7 +968,7 @@
     updateThemeIcon();
 
     function updateThemeIcon() {
-      themeBtn.textContent = isLight ? '\u263E DARK' : '\u2600 LIGHT';
+      themeBtn.innerHTML = isLight ? '<span style="font-size:1.1rem">\u263E</span> DARK' : '<span style="font-size:1.1rem">\u2600</span> LIGHT';
     }
 
     themeBtn.addEventListener('click', () => {
