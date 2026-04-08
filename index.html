@@ -473,7 +473,7 @@
   </div>
 
   <div class="top-btns">
-    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">LIGHT</button>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
     <button class="reset-btn" id="resetBtn">RESET</button>
   </div>
 
@@ -966,7 +966,7 @@
     updateThemeIcon();
 
     function updateThemeIcon() {
-      themeBtn.textContent = isLight ? 'DARK' : 'LIGHT';
+      themeBtn.textContent = isLight ? '\u263E DARK' : '\u2600 LIGHT';
     }
 
     themeBtn.addEventListener('click', () => {
