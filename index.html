@@ -314,77 +314,77 @@
       }
     }
 
-    // 32-step Brazilian phonk batidão sequence
+    // 32-step NO BATIDÃO style sequence
+    // Key: Fm, 130 BPM, progression: Fm → Db → Bbm → C
     let beatStep = 0;
 
-    // Melody — dark, hypnotic minor key hook (Cm)
-    // 0 = rest, otherwise freq in Hz
+    // Melody — F minor, hypnotic staccato hook following the chord progression
     const melodyPattern = [
-      // Bar 1: descending dark phrase
-      { n: 523.3, d: 0.18 },  // C5
+      // Bar 1: Fm (F Ab C) — punchy descending hook
+      { n: 349.2, d: 0.08 },  // F4
+      { n: 523.3, d: 0.08 },  // C5
+      { n: 415.3, d: 0.12 },  // Ab4
       { n: 0 },
-      { n: 466.2, d: 0.10 },  // Bb4
-      { n: 392.0, d: 0.10 },  // G4
+      { n: 349.2, d: 0.08 },  // F4
+      { n: 415.3, d: 0.08 },  // Ab4
+      { n: 349.2, d: 0.15 },  // F4
       { n: 0 },
-      { n: 349.2, d: 0.18 },  // F4
-      { n: 311.1, d: 0.10 },  // Eb4
-      { n: 0 },
-      // Bar 2: response phrase
+      // Bar 2: Db (Db F Ab) — response, higher energy
+      { n: 554.4, d: 0.08 },  // Db5
+      { n: 415.3, d: 0.08 },  // Ab4
       { n: 349.2, d: 0.12 },  // F4
-      { n: 392.0, d: 0.12 },  // G4
-      { n: 466.2, d: 0.20 },  // Bb4
       { n: 0 },
-      { n: 392.0, d: 0.10 },  // G4
-      { n: 349.2, d: 0.10 },  // F4
-      { n: 311.1, d: 0.22 },  // Eb4
+      { n: 415.3, d: 0.08 },  // Ab4
+      { n: 554.4, d: 0.08 },  // Db5
+      { n: 415.3, d: 0.15 },  // Ab4
       { n: 0 },
-      // Bar 3: climbs back up
-      { n: 311.1, d: 0.10 },  // Eb4
-      { n: 349.2, d: 0.10 },  // F4
-      { n: 392.0, d: 0.18 },  // G4
+      // Bar 3: Bbm (Bb Db F) — darker, building tension
+      { n: 466.2, d: 0.08 },  // Bb4
+      { n: 349.2, d: 0.08 },  // F4
+      { n: 277.2, d: 0.12 },  // Db4
       { n: 0 },
-      { n: 466.2, d: 0.14 },  // Bb4
-      { n: 523.3, d: 0.14 },  // C5
-      { n: 466.2, d: 0.10 },  // Bb4
+      { n: 349.2, d: 0.08 },  // F4
+      { n: 466.2, d: 0.08 },  // Bb4
+      { n: 349.2, d: 0.15 },  // F4
       { n: 0 },
-      // Bar 4: resolution
+      // Bar 4: C (C E G) — resolve, bright lift
+      { n: 523.3, d: 0.08 },  // C5
+      { n: 392.0, d: 0.08 },  // G4
+      { n: 329.6, d: 0.12 },  // E4
+      { n: 0 },
+      { n: 392.0, d: 0.08 },  // G4
       { n: 523.3, d: 0.10 },  // C5
-      { n: 0 },
-      { n: 466.2, d: 0.10 },  // Bb4
-      { n: 392.0, d: 0.20 },  // G4
-      { n: 0 },
-      { n: 311.1, d: 0.14 },  // Eb4
-      { n: 261.6, d: 0.22 },  // C4
+      { n: 392.0, d: 0.15 },  // G4
       { n: 0 },
     ];
 
-    // 808 bass — heavy slides, batidão bounce
+    // 808 bass — root notes with heavy slides following Fm → Db → Bbm → C
     const bassPattern = [
-      // Bar 1
-      130.8, 0, 0, 65.4,  0, 0, 98.0, 0,
-      // Bar 2
-      0, 87.3, 0, 0,  65.4, 0, 0, 65.4,
-      // Bar 3
-      130.8, 0, 0, 0,  87.3, 0, 65.4, 0,
-      // Bar 4
-      0, 0, 98.0, 0,  65.4, 0, 0, 130.8,
+      // Bar 1: Fm root = F
+      87.3, 0, 0, 87.3,  0, 87.3, 0, 0,
+      // Bar 2: Db root = Db
+      69.3, 0, 0, 69.3,  0, 0, 69.3, 0,
+      // Bar 3: Bbm root = Bb
+      58.3, 0, 58.3, 0,  0, 58.3, 0, 0,
+      // Bar 4: C root = C
+      65.4, 0, 0, 65.4,  0, 0, 65.4, 65.4,
     ];
 
-    // Bass slide amount (semitones down) for each hit
+    // Bass slide amount (semitones to glide down from)
     const bassSlide = [
-      5, 0, 0, 3,  0, 0, 4, 0,
-      0, 3, 0, 0,  5, 0, 0, 3,
-      5, 0, 0, 0,  3, 0, 4, 0,
-      0, 0, 4, 0,  3, 0, 0, 7,
+      7, 0, 0, 4,  0, 5, 0, 0,
+      7, 0, 0, 4,  0, 0, 5, 0,
+      7, 0, 5, 0,  0, 4, 0, 0,
+      5, 0, 0, 4,  0, 0, 5, 8,
     ];
 
-    // Drum pattern: K=kick, H=hat, C=cowbell, S=snare/clap, O=open hat, .=rest
-    // Classic batidão pattern with cowbell
+    // Drum pattern: K=kick, H=hat, C=cowbell, S=snare/clap, O=open hat
+    // Batidão bounce — syncopated with cowbell driving the groove
     const drumPattern = [
-      'K', 'H', 'C', 'H',  'S', 'H', 'C', 'K',
-      'H', 'C', 'H', 'K',  'S', 'C', 'H', 'O',
-      'K', 'C', 'H', 'H',  'S', 'H', 'C', 'K',
-      'H', 'C', 'K', 'H',  'S', 'O', 'C', 'K',
+      'K', 'C', 'H', 'C',  'S', 'C', 'H', 'K',
+      'C', 'H', 'C', 'K',  'S', 'C', 'O', 'C',
+      'K', 'C', 'H', 'C',  'S', 'C', 'K', 'H',
+      'C', 'K', 'C', 'H',  'S', 'C', 'O', 'K',
     ];
 
     function makeDistortionCurve(amount) {
@@ -466,20 +466,29 @@
     }
 
     function playCowbell(now) {
-      // Two detuned square waves for metallic cowbell tone
+      // Loud metallic cowbell — signature batidão sound
       const freqs = [587.3, 845];
       freqs.forEach(f => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         const bp = audioCtx.createBiquadFilter();
-        bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 8;
+        bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 12;
         osc.type = 'square';
         osc.frequency.setValueAtTime(f, now);
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
         osc.connect(bp); bp.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(now); osc.stop(now + 0.08);
+        osc.start(now); osc.stop(now + 0.06);
       });
+      // Extra click transient for attack
+      const click = audioCtx.createOscillator();
+      const cg = audioCtx.createGain();
+      click.type = 'square';
+      click.frequency.setValueAtTime(2000, now);
+      cg.gain.setValueAtTime(0.15, now);
+      cg.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
+      click.connect(cg); cg.connect(audioCtx.destination);
+      click.start(now); click.stop(now + 0.01);
     }
 
     function playBass(now, freq, slide) {
@@ -513,40 +522,42 @@
     }
 
     function playMelodyNote(now, freq, dur) {
-      // Dark square lead with filter sweep
+      // Aggressive staccato lead — punchy and distorted like phonk synths
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const filter = audioCtx.createBiquadFilter();
+      const dist = audioCtx.createWaveShaper();
+      dist.curve = makeDistortionCurve(80);
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(3000, now);
-      filter.frequency.exponentialRampToValueAtTime(800, now + dur);
-      filter.Q.value = 4;
+      filter.frequency.setValueAtTime(4000, now);
+      filter.frequency.exponentialRampToValueAtTime(1200, now + dur);
+      filter.Q.value = 6;
 
-      osc.type = 'square';
+      osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.13, now);
-      gain.gain.setValueAtTime(0.11, now + dur * 0.5);
+      gain.gain.setValueAtTime(0.16, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+      osc.connect(dist); dist.connect(filter); filter.connect(gain);
+      gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + dur);
 
-      // Detuned saw for width
+      // Detuned layer for thickness
       const osc2 = audioCtx.createOscillator();
       const g2 = audioCtx.createGain();
-      osc2.type = 'sawtooth';
-      osc2.frequency.setValueAtTime(freq * 1.005, now);
-      g2.gain.setValueAtTime(0.05, now);
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(freq * 0.998, now);
+      g2.gain.setValueAtTime(0.08, now);
       g2.gain.exponentialRampToValueAtTime(0.001, now + dur);
       osc2.connect(g2); g2.connect(audioCtx.destination);
       osc2.start(now); osc2.stop(now + dur);
 
-      // Octave-up shimmer
+      // Sub octave for weight
       const osc3 = audioCtx.createOscillator();
       const g3 = audioCtx.createGain();
       osc3.type = 'sine';
-      osc3.frequency.setValueAtTime(freq * 2, now);
-      g3.gain.setValueAtTime(0.03, now);
-      g3.gain.exponentialRampToValueAtTime(0.001, now + dur * 0.7);
+      osc3.frequency.setValueAtTime(freq * 0.5, now);
+      g3.gain.setValueAtTime(0.06, now);
+      g3.gain.exponentialRampToValueAtTime(0.001, now + dur * 0.8);
       osc3.connect(g3); g3.connect(audioCtx.destination);
       osc3.start(now); osc3.stop(now + dur);
     }
