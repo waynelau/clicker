@@ -508,7 +508,10 @@
     }
 
     btn.addEventListener('click', handleClick);
-    btn.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handleClick(e);
+    }, { passive: false });
 
     // Keyboard support
     document.addEventListener('keydown', (e) => {
