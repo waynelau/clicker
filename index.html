@@ -572,11 +572,31 @@
 
     .welcome-box {
       animation: welcomeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
     }
 
     @keyframes welcomeIn {
       0% { opacity: 0; transform: scale(0.85) translateY(30px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .welcome-dismiss {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 8px;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .welcome-dismiss:hover {
+      color: var(--text);
     }
 
     .welcome-emoji {
@@ -1022,17 +1042,14 @@
       font-weight: 700;
     }
 
-    .player-tag-switch {
+    .player-tag-link {
       cursor: pointer;
-      color: var(--accent);
-      transition: transform 0.2s, filter 0.2s;
-      font-size: 0.75rem;
       -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.2s;
     }
 
-    .player-tag-switch:hover {
-      transform: rotate(180deg);
-      filter: brightness(1.3);
+    .player-tag-link:hover {
+      opacity: 0.8;
     }
 
     /* Live activity toasts */
@@ -1183,6 +1200,7 @@
 
   <div class="welcome-modal" id="welcomeModal">
     <div class="welcome-box">
+      <button class="welcome-dismiss" id="welcomeDismiss" style="display:none">&times;</button>
       <div class="welcome-emoji">&#127925;</div>
       <div class="welcome-title">JOIN THE PHONK</div>
       <div class="welcome-subtitle">Create your clicker identity</div>
@@ -1789,14 +1807,23 @@
 
     function showPlayerTag() {
       if (playerName) {
-        playerTag.innerHTML = 'Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span><span class="player-tag-switch" id="switchUserBtn" title="Switch user">&#x21C4;</span>';
+        playerTag.innerHTML = '<span class="player-tag-link" id="switchUserBtn" title="Switch user">Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span> &#x21C4;</span>';
         document.getElementById('switchUserBtn').addEventListener('click', switchUser);
       } else {
         playerTag.innerHTML = '';
       }
     }
 
+    const welcomeDismiss = document.getElementById('welcomeDismiss');
+    // Track previous identity so dismiss can restore it
+    let prevName = '', prevPin = '', prevKey = '', prevCount = 0;
+
     function switchUser() {
+      // Save current identity so dismiss can restore
+      prevName = playerName;
+      prevPin = playerPin;
+      prevKey = playerKey;
+      prevCount = count;
       // Flush any pending score sync immediately
       clearTimeout(submitTimer);
       flushScore();
@@ -1820,9 +1847,24 @@
       document.getElementById('loginPinInput').value = '';
       clearWelcomeError(document.getElementById('welcomeError'));
       clearWelcomeError(document.getElementById('loginError'));
-      // Reopen welcome modal
+      // Show dismiss button and reopen welcome modal
+      welcomeDismiss.style.display = 'block';
       welcomeModal.classList.add('open');
     }
+
+    welcomeDismiss.addEventListener('click', () => {
+      // Restore previous identity
+      playerName = prevName;
+      playerPin = prevPin;
+      playerKey = prevKey;
+      count = prevCount;
+      counterEl.textContent = count.toLocaleString();
+      localStorage.setItem('phonkPlayerName', playerName);
+      localStorage.setItem('phonkPlayerPin', playerPin);
+      welcomeModal.classList.remove('open');
+      showPlayerTag();
+      listenToOwnScore();
+    });
 
     // Show welcome modal on first visit
     if (!playerName) {
