@@ -634,10 +634,27 @@
 
     .welcome-error {
       font-family: 'Orbitron', monospace;
-      font-size: 0.65rem;
-      color: var(--accent);
-      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #ff4466;
+      margin-top: 6px;
       min-height: 1em;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+
+    .welcome-error.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: errorShake 0.4s ease-in-out;
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
     }
 
     .welcome-section {
@@ -1649,6 +1666,19 @@
       return str.replace(/[<>&"'/]/g, '').trim().substring(0, 16);
     }
 
+    function showWelcomeError(el, msg) {
+      el.classList.remove('visible');
+      el.textContent = msg;
+      // Force reflow so animation restarts if already visible
+      void el.offsetWidth;
+      el.classList.add('visible');
+    }
+
+    function clearWelcomeError(el) {
+      el.classList.remove('visible');
+      el.textContent = '';
+    }
+
     function showPlayerTag() {
       playerTag.innerHTML = playerName ? 'Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span>' : '';
     }
@@ -1667,18 +1697,18 @@
       const name = sanitizeName(document.getElementById('nameInput').value);
       const pin = document.getElementById('pinInput').value;
       const errEl = document.getElementById('welcomeError');
-      errEl.textContent = '';
+      clearWelcomeError(errEl);
 
-      if (!name) { errEl.textContent = 'Enter a name!'; return; }
-      if (!/^\d{4}$/.test(pin)) { errEl.textContent = 'PIN must be 4 digits!'; return; }
+      if (!name) { showWelcomeError(errEl, 'Enter a username!'); return; }
+      if (!/^\d{4}$/.test(pin)) { showWelcomeError(errEl, 'PIN must be 4 digits!'); return; }
 
       const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (!key) { errEl.textContent = 'Invalid name!'; return; }
+      if (!key) { showWelcomeError(errEl, 'Invalid username!'); return; }
 
       const ref = db.ref('players/' + key);
       ref.once('value', snap => {
         if (snap.exists()) {
-          errEl.textContent = 'Name already taken!';
+          showWelcomeError(errEl, 'Username already taken!');
           return;
         }
         ref.set({
@@ -1696,7 +1726,7 @@
           showPlayerTag();
           listenToOwnScore();
         }).catch(() => {
-          errEl.textContent = 'Something went wrong!';
+          showWelcomeError(errEl, 'Something went wrong!');
         });
       });
     });
@@ -1706,18 +1736,18 @@
       const name = sanitizeName(document.getElementById('loginNameInput').value);
       const pin = document.getElementById('loginPinInput').value;
       const errEl = document.getElementById('loginError');
-      errEl.textContent = '';
+      clearWelcomeError(errEl);
 
-      if (!name) { errEl.textContent = 'Enter your name!'; return; }
-      if (!/^\d{4}$/.test(pin)) { errEl.textContent = 'PIN must be 4 digits!'; return; }
+      if (!name) { showWelcomeError(errEl, 'Enter your username!'); return; }
+      if (!/^\d{4}$/.test(pin)) { showWelcomeError(errEl, 'PIN must be 4 digits!'); return; }
 
       const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (!key) { errEl.textContent = 'Invalid name!'; return; }
+      if (!key) { showWelcomeError(errEl, 'Invalid username!'); return; }
 
       const ref = db.ref('players/' + key);
       ref.once('value', snap => {
         if (!snap.exists()) {
-          errEl.textContent = 'Name not found!';
+          showWelcomeError(errEl, 'Username not found!');
           return;
         }
         // Try updating — Firebase rules will reject if PIN doesn't match
@@ -1741,7 +1771,7 @@
           showPlayerTag();
           listenToOwnScore();
         }).catch(() => {
-          errEl.textContent = 'Wrong PIN!';
+          showWelcomeError(errEl, 'Wrong PIN!');
         });
       });
     });
