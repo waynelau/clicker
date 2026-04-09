@@ -436,7 +436,27 @@
       right: 20px;
       z-index: 15;
       display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .top-btns-row {
+      display: flex;
       gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 520px) {
+      .top-btns { top: 10px; right: 10px; gap: 4px; }
+      .top-btns-row { gap: 5px; }
+      .theme-btn, .reset-btn, .lb-btn, .auto-btn {
+        font-size: 0.75rem;
+        padding: 8px 10px;
+        min-width: 0;
+      }
+      .theme-btn { min-width: 80px; }
     }
 
     .theme-btn {
@@ -712,14 +732,12 @@
     }
 
     .player-tag {
-      position: fixed;
-      top: 64px;
-      right: 20px;
-      z-index: 15;
       font-family: 'Orbitron', monospace;
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       color: var(--text-dim);
       letter-spacing: 0.1em;
+      white-space: nowrap;
+      padding-right: 2px;
     }
   </style>
 </head>
@@ -737,12 +755,14 @@
   </div>
 
   <div class="top-btns">
-    <button class="lb-btn" id="lbBtn">BOARD</button>
-    <button class="auto-btn" id="autoBtn">&#9654; AUTO</button>
-    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
-    <button class="reset-btn" id="resetBtn">RESET</button>
+    <div class="top-btns-row">
+      <button class="lb-btn" id="lbBtn">🏆 LEADERBOARD</button>
+      <button class="auto-btn" id="autoBtn" style="display:none">&#9654; AUTO</button>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
+      <button class="reset-btn" id="resetBtn">RESET</button>
+    </div>
+    <span class="player-tag" id="playerTag"></span>
   </div>
-  <div class="player-tag" id="playerTag"></div>
 
   <div class="reset-modal" id="resetModal">
     <div class="reset-box">
