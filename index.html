@@ -559,6 +559,52 @@
       padding: 24px 20px;
     }
 
+    @media (min-width: 600px) {
+      .lb-box {
+        max-width: 560px;
+        padding: 32px 36px;
+        border-width: 2px;
+        box-shadow: 0 0 80px var(--accent-glow-m), 0 0 200px var(--accent-glow-w);
+      }
+
+      .lb-title {
+        font-size: 3rem;
+        margin-bottom: 4px;
+        text-shadow: 0 0 30px var(--accent-glow-s), 0 0 60px var(--accent-glow-w);
+      }
+
+      .lb-subtitle {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        margin-bottom: 20px;
+      }
+
+      .lb-podium { gap: 12px; margin-bottom: 20px; }
+      .lb-podium-card { max-width: 160px; padding: 14px 10px 16px; border-radius: 12px; }
+      .lb-podium-card.gold { min-height: 140px; }
+      .lb-podium-card.silver { min-height: 120px; }
+      .lb-podium-card.bronze { min-height: 110px; }
+      .lb-podium-medal { font-size: 1.8rem; }
+      .lb-podium-card.gold .lb-podium-medal { font-size: 2.2rem; }
+      .lb-podium-name { font-size: 1.05rem; }
+      .lb-podium-card.gold .lb-podium-name { font-size: 1.2rem; }
+      .lb-podium-score { font-size: 0.75rem; }
+      .lb-podium-card.gold .lb-podium-score { font-size: 0.85rem; }
+
+      .lb-list { max-height: 40vh; }
+      .lb-row { padding: 9px 16px; gap: 12px; }
+      .lb-rank { font-size: 0.7rem; min-width: 34px; }
+      .lb-name { font-size: 1.2rem; }
+      .lb-score { font-size: 0.75rem; }
+
+      .lb-my-rank { padding: 12px 18px; gap: 12px; border-radius: 10px; }
+      .lb-my-rank .lb-name { font-size: 1.1rem; }
+
+      .lb-you-badge { font-size: 0.55rem; padding: 2px 8px; }
+
+      .lb-close { font-size: 1.2rem; padding: 12px 32px; margin-top: 20px; }
+    }
+
     .welcome-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.8rem;
@@ -793,6 +839,10 @@
       border-radius: 4px;
       letter-spacing: 0.08em;
       flex-shrink: 0;
+      vertical-align: middle;
+      margin-left: 8px;
+      position: relative;
+      top: -1px;
     }
 
     /* Sticky "your rank" bar */
@@ -969,7 +1019,7 @@
     const streakLabel = document.getElementById('streakLabel');
     const comboText = document.getElementById('comboText');
 
-    let count = parseInt(localStorage.getItem('phonkClicks') || '0');
+    let count = 0; // Loaded from Firebase via real-time listener
     let streak = 0;
     let streakTimer = null;
     let lastClickTime = 0;
@@ -1351,7 +1401,6 @@
     function handleClick(e) {
       initAudio();
       count++;
-      localStorage.setItem('phonkClicks', count.toString());
       counterEl.textContent = count.toLocaleString();
 
       // Bump animation
@@ -1419,7 +1468,6 @@
       count = 0;
       beatStep = 0;
       streak = 0;
-      localStorage.setItem('phonkClicks', '0');
       counterEl.textContent = '0';
       streakBar.style.width = '0%';
       streakLabel.classList.remove('visible');
@@ -1582,7 +1630,6 @@
           const remote = snap.val().score || 0;
           if (remote > count) {
             count = remote;
-            localStorage.setItem('phonkClicks', count.toString());
             counterEl.textContent = count.toLocaleString();
           }
           localStorage.setItem('phonkPlayerName', playerName);
@@ -1627,7 +1674,6 @@
         const remote = snap.val();
         if (remote != null && remote > count) {
           count = remote;
-          localStorage.setItem('phonkClicks', count.toString());
           counterEl.textContent = count.toLocaleString();
         }
       });
@@ -1673,9 +1719,8 @@
       lbPodium.innerHTML = top3.map((e, i) => {
         const isMe = e.key === playerKey;
         return '<div class="lb-podium-card ' + classes[i] + (isMe ? ' lb-me' : '') + '">' +
-          (isMe ? youBadge : '') +
           '<span class="lb-podium-medal">' + medals[i] + '</span>' +
-          '<div class="lb-podium-name">' + escapeHtml(e.name) + '</div>' +
+          '<div class="lb-podium-name">' + escapeHtml(e.name) + (isMe ? ' ' + youBadge : '') + '</div>' +
           '<div class="lb-podium-score">' + e.score.toLocaleString() + '</div>' +
           '</div>';
       }).join('');
@@ -1690,8 +1735,7 @@
           const rank = i + 4;
           return '<div class="lb-row' + (isMe ? ' lb-me' : '') + '">' +
             '<span class="lb-rank">' + rank + '</span>' +
-            (isMe ? youBadge : '') +
-            '<span class="lb-name">' + escapeHtml(e.name) + '</span>' +
+            '<span class="lb-name">' + escapeHtml(e.name) + (isMe ? ' ' + youBadge : '') + '</span>' +
             '<span class="lb-score">' + e.score.toLocaleString() + '</span>' +
             '</div>';
         }).join('');
@@ -1704,8 +1748,7 @@
         lbMyRank.style.display = 'flex';
         lbMyRank.innerHTML =
           '<span class="lb-rank">#' + myRank + '</span>' +
-          '<span class="lb-you-badge">YOU</span>' +
-          '<span class="lb-name">' + escapeHtml(me.name) + '</span>' +
+          '<span class="lb-name">' + escapeHtml(me.name) + ' <span class="lb-you-badge">YOU</span></span>' +
           '<span class="lb-score">' + me.score.toLocaleString() + '</span>';
       } else {
         lbMyRank.style.display = 'none';
