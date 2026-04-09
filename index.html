@@ -1742,7 +1742,7 @@
         const isMe = e.key === playerKey;
         return '<div class="lb-podium-card ' + classes[i] + (isMe ? ' lb-me' : '') + '">' +
           '<span class="lb-podium-medal">' + medals[i] + '</span>' +
-          '<div class="lb-podium-name">' + escapeHtml(e.name) + (isMe ? ' ' + youBadge : '') + '</div>' +
+          '<div class="lb-podium-name">' + escapeHtml(e.name) + '</div>' +
           '<div class="lb-podium-score">' + e.score.toLocaleString() + '</div>' +
           '</div>';
       }).join('');
