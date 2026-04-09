@@ -12,7 +12,7 @@
     :root {
       --bg: #0a0a0a;
       --bg-alt: #120008;
-      --grid-color: rgba(255,0,80,0.03);
+      --grid-color: rgba(255,0,80,0.07);
       --vignette: rgba(0,0,0,0.8);
       --accent: #ff0050;
       --accent-light: #ff3377;
@@ -41,7 +41,7 @@
     .light {
       --bg: #f5f0f2;
       --bg-alt: #ffe8ee;
-      --grid-color: rgba(255,0,80,0.06);
+      --grid-color: rgba(255,0,80,0.1);
       --vignette: rgba(255,255,255,0.6);
       --accent: #e0003e;
       --accent-light: #ff1a5e;
@@ -83,12 +83,23 @@
 
     .bg-grid {
       position: fixed;
-      inset: 0;
+      inset: -40px;
       background-image:
         linear-gradient(var(--grid-color) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
+      animation: gridDrift 20s linear infinite, gridPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes gridDrift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(40px, 40px); }
+    }
+
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
     }
 
     .vignette {
