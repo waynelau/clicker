@@ -1347,17 +1347,8 @@
       welcomeModal.classList.add('open');
     } else {
       showPlayerTag();
-      // Load remote score on return visit
-      db.ref('players/' + playerKey).once('value', snap => {
-        if (snap.exists()) {
-          const remote = snap.val().score || 0;
-          if (remote > count) {
-            count = remote;
-            localStorage.setItem('phonkClicks', count.toString());
-            counterEl.textContent = count.toLocaleString();
-          }
-        }
-      });
+      // Real-time sync — picks up higher score from other tabs/devices
+      listenToOwnScore();
     }
 
     // New player registration
@@ -1392,6 +1383,7 @@
           localStorage.setItem('phonkPlayerPin', pin);
           welcomeModal.classList.remove('open');
           showPlayerTag();
+          listenToOwnScore();
         }).catch(() => {
           errEl.textContent = 'Something went wrong!';
         });
@@ -1437,24 +1429,48 @@
           localStorage.setItem('phonkPlayerPin', pin);
           welcomeModal.classList.remove('open');
           showPlayerTag();
+          listenToOwnScore();
         }).catch(() => {
           errEl.textContent = 'Wrong PIN!';
         });
       });
     });
 
-    // Debounced auto-sync (5 seconds)
+    // Debounced auto-sync (5 seconds) — uses transaction to prevent stale tabs overwriting higher scores
     let submitTimer = null;
     function debouncedSubmit() {
       if (!playerName || !playerKey) return;
       clearTimeout(submitTimer);
       submitTimer = setTimeout(() => {
-        db.ref('players/' + playerKey).update({
-          score: count,
-          pin: playerPin,
-          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        db.ref('players/' + playerKey).transaction(current => {
+          if (current === null) {
+            // Entry doesn't exist yet — create it
+            return { name: playerName, pin: playerPin, score: count, updatedAt: firebase.database.ServerValue.TIMESTAMP };
+          }
+          // Only update if local count is higher than remote
+          if (count > (current.score || 0)) {
+            current.score = count;
+            current.pin = playerPin;
+            current.updatedAt = firebase.database.ServerValue.TIMESTAMP;
+            return current;
+          }
+          // Local is stale — abort the write (return undefined)
+          return;
         });
       }, 5000);
+    }
+
+    // Real-time listener on own score — keeps local count in sync across tabs/devices
+    function listenToOwnScore() {
+      if (!playerKey) return;
+      db.ref('players/' + playerKey + '/score').on('value', snap => {
+        const remote = snap.val();
+        if (remote != null && remote > count) {
+          count = remote;
+          localStorage.setItem('phonkClicks', count.toString());
+          counterEl.textContent = count.toLocaleString();
+        }
+      });
     }
 
     // Leaderboard modal
