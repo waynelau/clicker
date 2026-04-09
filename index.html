@@ -1583,7 +1583,12 @@
       }
 
       if (streak >= 5) {
-        comboText.textContent = streak >= 20 ? 'UNSTOPPABLE' : streak >= 15 ? 'GODLIKE' : streak >= 10 ? 'ON FIRE' : 'COMBO';
+        const comboTier1 = ['COMBO', 'NICE', 'SWEET', 'SMOOTH', 'CLEAN', 'VIBIN', 'SHEESH', 'LETS GO', 'YO', 'BRUH', 'EASY', 'CRISPY', 'SLICK', 'FRESH', 'NOICE', 'DANG', 'JUICY', 'SNAPPY', 'LOCKED IN', 'COZY'];
+        const comboTier2 = ['ON FIRE', 'BEAST MODE', 'TURBO', 'MEGA', 'HYPED', 'CRACKED', 'GOATED', 'NO CAP', 'BUSSIN', 'ZOOMING', 'ELITE', 'SAVAGE', 'AMPED', 'COOKING', 'INSANE', 'LEGEND', 'SAUCY', 'CLUTCH', 'DEMON MODE', 'LOCKED IN FR'];
+        const comboTier3 = ['GODLIKE', 'ASCENDED', 'MYTHICAL', 'TRANSCENDED', 'GALAXY BRAIN', 'FINAL BOSS', 'PHONK LORD', 'ACTUALLY INSANE', 'BUILT DIFFERENT', 'MAIN CHARACTER', 'GOAT STATUS', 'MAXED OUT', 'GOD TIER', 'BOSS LEVEL', 'ULTRA INSTINCT', 'PRESTIGE', 'S TIER', 'RIZZ LORD', 'ANIME ARC', 'PEAK PERFORMANCE'];
+        const comboTier4 = ['UNSTOPPABLE', 'INFINITE POWER', 'BEYOND GODLIKE', 'OFF THE CHARTS', 'PHONK DEITY', 'CLICK WIZARD', 'ARE YOU OK??', 'SOMEONE STOP THEM', 'THIS IS ILLEGAL', 'WORLD RECORD PACE', 'ABSOLUTE UNIT', 'NOT EVEN FAIR', 'BREAKING REALITY', 'FINGERS OF FURY', 'TOO POWERFUL', 'MAXIMUM OVERDRIVE', 'GOING NUCLEAR', 'LIGHT SPEED', 'REALITY CHECK', 'CERTIFIED MANIAC'];
+        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+        comboText.textContent = streak >= 20 ? pick(comboTier4) : streak >= 15 ? pick(comboTier3) : streak >= 10 ? pick(comboTier2) : pick(comboTier1);
         comboText.classList.add('visible');
         comboText.style.transform = `translateX(-50%) scale(${1 + streak * 0.02})`;
       }
