@@ -484,6 +484,243 @@
       background: var(--accent);
       border-color: var(--accent);
     }
+
+    .lb-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      background: transparent;
+      border: 1px solid var(--text-dim);
+      border-radius: 8px;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .lb-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Welcome & Leaderboard modals */
+    .welcome-modal, .lb-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--modal-bg);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-modal.open, .lb-modal.open {
+      display: flex;
+    }
+
+    .welcome-box, .lb-box {
+      background: var(--modal-box);
+      border: 1px solid var(--modal-border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      text-align: center;
+      box-shadow: 0 0 60px var(--accent-glow-w);
+      max-width: 360px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .welcome-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .welcome-sub {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin: 16px 0 8px;
+    }
+
+    .welcome-hint {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      margin: 4px 0 16px;
+    }
+
+    .welcome-divider {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin: 20px 0;
+    }
+
+    .welcome-error {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      margin-top: 8px;
+      min-height: 1.2em;
+    }
+
+    .welcome-input {
+      display: block;
+      width: 100%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--text-dim);
+      border-radius: 8px;
+      padding: 10px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+
+    .welcome-input:focus {
+      border-color: var(--accent);
+    }
+
+    .welcome-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .welcome-input.pin {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.6rem;
+      letter-spacing: 0.4em;
+      max-width: 180px;
+      margin: 0 auto;
+    }
+
+    .welcome-submit {
+      display: block;
+      width: 100%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.15em;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .welcome-submit:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px var(--accent-glow-s);
+    }
+
+    .welcome-submit.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    /* Leaderboard list */
+    .lb-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .lb-list {
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--reset-border);
+      gap: 10px;
+    }
+
+    .lb-row.lb-me {
+      background: var(--accent-glow-w);
+      border-radius: 6px;
+    }
+
+    .lb-rank {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .lb-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      flex: 1;
+      text-align: left;
+      letter-spacing: 0.05em;
+    }
+
+    .lb-score {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .lb-empty {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 24px 0;
+    }
+
+    .lb-close {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      color: var(--cancel-color);
+      background: transparent;
+      border: 1px solid var(--cancel-border);
+      border-radius: 8px;
+      padding: 10px 24px;
+      margin-top: 16px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .lb-close:hover {
+      color: var(--text);
+      border-color: var(--text-dim);
+    }
+
+    .player-tag {
+      position: fixed;
+      top: 64px;
+      right: 20px;
+      z-index: 15;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
   </style>
 </head>
 <body>
@@ -500,10 +737,12 @@
   </div>
 
   <div class="top-btns">
+    <button class="lb-btn" id="lbBtn">BOARD</button>
     <button class="auto-btn" id="autoBtn">&#9654; AUTO</button>
     <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
     <button class="reset-btn" id="resetBtn">RESET</button>
   </div>
+  <div class="player-tag" id="playerTag"></div>
 
   <div class="reset-modal" id="resetModal">
     <div class="reset-box">
@@ -516,11 +755,51 @@
     </div>
   </div>
 
+  <div class="welcome-modal" id="welcomeModal">
+    <div class="welcome-box">
+      <div class="welcome-title">WHAT'S YOUR NAME?</div>
+      <input type="text" class="welcome-input" id="nameInput" placeholder="YOUR NAME" maxlength="16" autocomplete="off">
+      <div class="welcome-sub">PICK A 4-DIGIT PIN</div>
+      <input type="text" class="welcome-input pin" id="pinInput" placeholder="1234" maxlength="4" inputmode="numeric" autocomplete="off">
+      <div class="welcome-hint">Remember your PIN to play on other devices</div>
+      <button class="welcome-submit" id="welcomeSubmit">LET'S GO</button>
+      <div class="welcome-error" id="welcomeError"></div>
+      <div class="welcome-divider">&mdash; OR &mdash;</div>
+      <div class="welcome-sub">ALREADY HAVE A NAME?</div>
+      <input type="text" class="welcome-input" id="loginNameInput" placeholder="YOUR NAME" maxlength="16" autocomplete="off">
+      <input type="text" class="welcome-input pin" id="loginPinInput" placeholder="PIN" maxlength="4" inputmode="numeric" autocomplete="off">
+      <button class="welcome-submit secondary" id="loginSubmit">SIGN IN</button>
+      <div class="welcome-error" id="loginError"></div>
+    </div>
+  </div>
+
+  <div class="lb-modal" id="lbModal">
+    <div class="lb-box">
+      <div class="lb-title">LEADERBOARD</div>
+      <div class="lb-list" id="lbList">
+        <div class="lb-empty">NO SCORES YET</div>
+      </div>
+      <button class="lb-close" id="lbClose">CLOSE</button>
+    </div>
+  </div>
+
   <div class="streak-bar" id="streakBar" style="width: 0%"></div>
   <div class="streak-label" id="streakLabel"></div>
   <div class="combo-text" id="comboText"></div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script>
+    // TODO: Replace with your Firebase config from console.firebase.google.com
+    const firebaseConfig = {
+      apiKey: "TODO",
+      authDomain: "TODO.firebaseapp.com",
+      databaseURL: "https://TODO-default-rtdb.firebaseio.com",
+      projectId: "TODO"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const counterEl = document.getElementById('counter');
     const btn = document.getElementById('clickBtn');
     const particlesEl = document.getElementById('particles');
@@ -934,6 +1213,9 @@
         showMilestone(milestones[count]);
       }
 
+      // Sync score to leaderboard
+      debouncedSubmit();
+
       // Hue shift at milestones
       if (count % 100 === 0) {
         document.body.style.transition = 'background 0.5s';
@@ -981,6 +1263,14 @@
       streakLabel.classList.remove('visible');
       comboText.classList.remove('visible');
       resetModal.classList.remove('open');
+      // Reset remote score
+      if (playerName && playerKey) {
+        db.ref('players/' + playerKey).update({
+          score: 0,
+          pin: playerPin,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
     });
 
     resetModal.addEventListener('click', (e) => {
@@ -1022,6 +1312,178 @@
       document.body.classList.toggle('light', isLight);
       localStorage.setItem('phonkTheme', isLight ? 'light' : 'dark');
       updateThemeIcon();
+    });
+
+    // ─── Leaderboard & Player Identity ───
+    const lbBtn = document.getElementById('lbBtn');
+    const lbModal = document.getElementById('lbModal');
+    const lbClose = document.getElementById('lbClose');
+    const lbList = document.getElementById('lbList');
+    const welcomeModal = document.getElementById('welcomeModal');
+    const playerTag = document.getElementById('playerTag');
+
+    let playerName = localStorage.getItem('phonkPlayerName') || '';
+    let playerPin = localStorage.getItem('phonkPlayerPin') || '';
+    let playerKey = playerName ? playerName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function sanitizeName(str) {
+      return str.replace(/[<>&"'/]/g, '').trim().substring(0, 16);
+    }
+
+    function showPlayerTag() {
+      playerTag.textContent = playerName ? 'Playing as ' + playerName : '';
+    }
+
+    // Show welcome modal on first visit
+    if (!playerName) {
+      welcomeModal.classList.add('open');
+    } else {
+      showPlayerTag();
+      // Load remote score on return visit
+      db.ref('players/' + playerKey).once('value', snap => {
+        if (snap.exists()) {
+          const remote = snap.val().score || 0;
+          if (remote > count) {
+            count = remote;
+            localStorage.setItem('phonkClicks', count.toString());
+            counterEl.textContent = count.toLocaleString();
+          }
+        }
+      });
+    }
+
+    // New player registration
+    document.getElementById('welcomeSubmit').addEventListener('click', () => {
+      const name = sanitizeName(document.getElementById('nameInput').value);
+      const pin = document.getElementById('pinInput').value;
+      const errEl = document.getElementById('welcomeError');
+      errEl.textContent = '';
+
+      if (!name) { errEl.textContent = 'Enter a name!'; return; }
+      if (!/^\d{4}$/.test(pin)) { errEl.textContent = 'PIN must be 4 digits!'; return; }
+
+      const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!key) { errEl.textContent = 'Invalid name!'; return; }
+
+      const ref = db.ref('players/' + key);
+      ref.once('value', snap => {
+        if (snap.exists()) {
+          errEl.textContent = 'Name already taken!';
+          return;
+        }
+        ref.set({
+          name: name,
+          pin: pin,
+          score: count,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+          playerName = name;
+          playerPin = pin;
+          playerKey = key;
+          localStorage.setItem('phonkPlayerName', name);
+          localStorage.setItem('phonkPlayerPin', pin);
+          welcomeModal.classList.remove('open');
+          showPlayerTag();
+        }).catch(() => {
+          errEl.textContent = 'Something went wrong!';
+        });
+      });
+    });
+
+    // Sign in (cross-device)
+    document.getElementById('loginSubmit').addEventListener('click', () => {
+      const name = sanitizeName(document.getElementById('loginNameInput').value);
+      const pin = document.getElementById('loginPinInput').value;
+      const errEl = document.getElementById('loginError');
+      errEl.textContent = '';
+
+      if (!name) { errEl.textContent = 'Enter your name!'; return; }
+      if (!/^\d{4}$/.test(pin)) { errEl.textContent = 'PIN must be 4 digits!'; return; }
+
+      const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!key) { errEl.textContent = 'Invalid name!'; return; }
+
+      const ref = db.ref('players/' + key);
+      ref.once('value', snap => {
+        if (!snap.exists()) {
+          errEl.textContent = 'Name not found!';
+          return;
+        }
+        // Try updating — Firebase rules will reject if PIN doesn't match
+        ref.update({
+          pin: pin,
+          score: Math.max(count, snap.val().score || 0),
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+          playerName = snap.val().name;
+          playerPin = pin;
+          playerKey = key;
+          // Load remote score
+          const remote = snap.val().score || 0;
+          if (remote > count) {
+            count = remote;
+            localStorage.setItem('phonkClicks', count.toString());
+            counterEl.textContent = count.toLocaleString();
+          }
+          localStorage.setItem('phonkPlayerName', playerName);
+          localStorage.setItem('phonkPlayerPin', pin);
+          welcomeModal.classList.remove('open');
+          showPlayerTag();
+        }).catch(() => {
+          errEl.textContent = 'Wrong PIN!';
+        });
+      });
+    });
+
+    // Debounced auto-sync (5 seconds)
+    let submitTimer = null;
+    function debouncedSubmit() {
+      if (!playerName || !playerKey) return;
+      clearTimeout(submitTimer);
+      submitTimer = setTimeout(() => {
+        db.ref('players/' + playerKey).update({
+          score: count,
+          pin: playerPin,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+      }, 5000);
+    }
+
+    // Leaderboard modal
+    lbBtn.addEventListener('click', () => { lbModal.classList.add('open'); });
+    lbClose.addEventListener('click', () => { lbModal.classList.remove('open'); });
+    lbModal.addEventListener('click', (e) => { if (e.target === lbModal) lbModal.classList.remove('open'); });
+
+    // Real-time leaderboard listener (top 20)
+    db.ref('players').orderByChild('score').limitToLast(20).on('value', snap => {
+      const entries = [];
+      snap.forEach(child => {
+        const d = child.val();
+        entries.push({ key: child.key, name: d.name || child.key, score: d.score || 0 });
+      });
+      entries.sort((a, b) => b.score - a.score);
+
+      if (entries.length === 0) {
+        lbList.innerHTML = '<div class="lb-empty">NO SCORES YET</div>';
+        return;
+      }
+
+      const rankIcons = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49'];
+      lbList.innerHTML = entries.map((e, i) => {
+        const isMe = e.key === playerKey;
+        const rank = i < 3 ? rankIcons[i] : '#' + (i + 1);
+        return '<div class="lb-row' + (isMe ? ' lb-me' : '') + '">' +
+          '<span class="lb-rank">' + rank + '</span>' +
+          '<span class="lb-name">' + escapeHtml(e.name) + '</span>' +
+          '<span class="lb-score">' + e.score.toLocaleString() + '</span>' +
+          '</div>';
+      }).join('');
     });
   </script>
 </body>
