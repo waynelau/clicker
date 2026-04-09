@@ -1957,11 +1957,15 @@
       return null;
     }
 
-    function showToast(name, milestone) {
+    function showToast(name, milestone, isSelf) {
       const el = document.createElement('div');
       el.className = 'toast';
       const formatted = milestone >= 1000 ? (milestone / 1000) + 'K' : milestone.toLocaleString();
-      el.innerHTML = '<span class="toast-icon">\uD83D\uDD25</span><span class="toast-name">' + escapeHtml(name) + '</span> hit <span class="toast-milestone">' + formatted + '!</span>';
+      if (isSelf) {
+        el.innerHTML = '<span class="toast-icon">\uD83C\uDF89</span><span class="toast-name">YOU</span> hit <span class="toast-milestone">' + formatted + '!</span>';
+      } else {
+        el.innerHTML = '<span class="toast-icon">\uD83D\uDD25</span><span class="toast-name">' + escapeHtml(name) + '</span> hit <span class="toast-milestone">' + formatted + '!</span>';
+      }
       toastContainer.appendChild(el);
       // Remove after animation completes
       setTimeout(() => el.remove(), 3600);
@@ -1981,13 +1985,12 @@
       });
       entries.sort((a, b) => b.score - a.score);
 
-      // Detect milestone crossings for other players → show toast
+      // Detect milestone crossings → show toast
       entries.forEach(e => {
-        if (e.key === playerKey) { prevScores[e.key] = e.score; return; } // skip self
         const old = prevScores[e.key];
         if (old != null) { // skip first load
           const milestone = getMilestoneCrossed(old, e.score);
-          if (milestone) showToast(e.name, milestone);
+          if (milestone) showToast(e.name, milestone, e.key === playerKey);
         }
         prevScores[e.key] = e.score;
       });
