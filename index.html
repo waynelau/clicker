@@ -1706,17 +1706,9 @@
 
     function switchUser() {
       // Flush any pending score sync immediately
-      if (playerKey && playerName) {
-        clearTimeout(submitTimer);
-        db.ref('players/' + playerKey).transaction(current => {
-          if (current && count > (current.score || 0)) {
-            current.score = count;
-            current.pin = playerPin;
-            current.updatedAt = firebase.database.ServerValue.TIMESTAMP;
-            return current;
-          }
-          return;
-        });
+      clearTimeout(submitTimer);
+      flushScore();
+      if (playerKey) {
         // Detach real-time listener for old player
         db.ref('players/' + playerKey + '/score').off();
       }
@@ -1831,28 +1823,29 @@
       });
     });
 
-    // Debounced auto-sync (5 seconds) — uses transaction to prevent stale tabs overwriting higher scores
+    // Sync score to Firebase — uses transaction to prevent stale tabs overwriting higher scores
+    function flushScore() {
+      if (!playerName || !playerKey) return;
+      db.ref('players/' + playerKey).transaction(current => {
+        if (current === null) {
+          return { name: playerName, pin: playerPin, score: count, updatedAt: firebase.database.ServerValue.TIMESTAMP };
+        }
+        if (count > (current.score || 0)) {
+          current.score = count;
+          current.pin = playerPin;
+          current.updatedAt = firebase.database.ServerValue.TIMESTAMP;
+          return current;
+        }
+        return;
+      });
+    }
+
+    // Debounced auto-sync (5 seconds)
     let submitTimer = null;
     function debouncedSubmit() {
       if (!playerName || !playerKey) return;
       clearTimeout(submitTimer);
-      submitTimer = setTimeout(() => {
-        db.ref('players/' + playerKey).transaction(current => {
-          if (current === null) {
-            // Entry doesn't exist yet — create it
-            return { name: playerName, pin: playerPin, score: count, updatedAt: firebase.database.ServerValue.TIMESTAMP };
-          }
-          // Only update if local count is higher than remote
-          if (count > (current.score || 0)) {
-            current.score = count;
-            current.pin = playerPin;
-            current.updatedAt = firebase.database.ServerValue.TIMESTAMP;
-            return current;
-          }
-          // Local is stale — abort the write (return undefined)
-          return;
-        });
-      }, 5000);
+      submitTimer = setTimeout(flushScore, 5000);
     }
 
     // Real-time listener on own score — keeps local count in sync across tabs/devices
@@ -1867,9 +1860,12 @@
       });
     }
 
-    // Leaderboard modal — auto-scroll to player's row on open
+    // Leaderboard modal — flush score + auto-scroll to player's row on open
     const lbMyRank = document.getElementById('lbMyRank');
     lbBtn.addEventListener('click', () => {
+      // Flush any pending score so leaderboard is instantly up to date
+      clearTimeout(submitTimer);
+      flushScore();
       lbModal.classList.add('open');
       setTimeout(() => {
         const myRow = lbList.querySelector('.lb-me');
