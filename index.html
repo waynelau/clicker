@@ -2035,18 +2035,8 @@
         }).join('');
       }
 
-      // Sticky "your rank" bar — always visible at bottom
-      if (myIndex >= 0) {
-        const me = entries[myIndex];
-        const myRank = myIndex + 1;
-        lbMyRank.style.display = 'flex';
-        lbMyRank.innerHTML =
-          '<span class="lb-rank">#' + myRank + '</span>' +
-          '<span class="lb-name">' + escapeHtml(me.name) + ' <span class="lb-you-badge">YOU</span></span>' +
-          '<span class="lb-score">' + me.score.toLocaleString() + '</span>';
-      } else {
-        lbMyRank.style.display = 'none';
-      }
+      // Hide the old sticky rank bar — user is highlighted in-place with YOU badge
+      lbMyRank.style.display = 'none';
     });
   </script>
 </body>
