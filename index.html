@@ -1042,6 +1042,11 @@
       font-weight: 700;
     }
 
+    .switch-icon {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
     .player-tag-link {
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -1807,7 +1812,7 @@
 
     function showPlayerTag() {
       if (playerName) {
-        playerTag.innerHTML = '<span class="player-tag-link" id="switchUserBtn" title="Switch user">Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span> &#x21C4;</span>';
+        playerTag.innerHTML = '<span class="player-tag-link" id="switchUserBtn" title="Switch user">Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span> <span class="switch-icon">&#x21C4;</span></span>';
         document.getElementById('switchUserBtn').addEventListener('click', switchUser);
       } else {
         playerTag.innerHTML = '';
