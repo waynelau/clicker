@@ -778,8 +778,41 @@
     }
 
     .lb-row.lb-me {
-      background: var(--accent-glow-w);
-      box-shadow: inset 0 0 10px var(--accent-glow-w);
+      background: linear-gradient(90deg, var(--accent-glow-w), rgba(255,0,80,0.08));
+      box-shadow: inset 0 0 12px var(--accent-glow-w), 0 0 8px var(--accent-glow-w);
+      border: 1px solid var(--accent-glow-m);
+    }
+
+    .lb-you-badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.5rem;
+      font-weight: 700;
+      color: var(--modal-box);
+      background: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+    }
+
+    /* Sticky "your rank" bar */
+    .lb-my-rank {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      background: linear-gradient(90deg, var(--accent-glow-w), rgba(255,0,80,0.06));
+      border: 1px solid var(--accent-glow-m);
+      border-radius: 8px;
+    }
+
+    .lb-my-rank .lb-rank {
+      color: var(--accent);
+    }
+
+    .lb-my-rank .lb-name {
+      font-size: 1rem;
     }
 
     .lb-rank {
@@ -905,6 +938,7 @@
       <div class="lb-subtitle">TOP CLICKERS</div>
       <div class="lb-podium" id="lbPodium"></div>
       <div class="lb-list" id="lbList"></div>
+      <div class="lb-my-rank" id="lbMyRank" style="display:none"></div>
       <button class="lb-close" id="lbClose">CLOSE</button>
     </div>
   </div>
@@ -1599,8 +1633,15 @@
       });
     }
 
-    // Leaderboard modal
-    lbBtn.addEventListener('click', () => { lbModal.classList.add('open'); });
+    // Leaderboard modal — auto-scroll to player's row on open
+    const lbMyRank = document.getElementById('lbMyRank');
+    lbBtn.addEventListener('click', () => {
+      lbModal.classList.add('open');
+      setTimeout(() => {
+        const myRow = lbList.querySelector('.lb-me');
+        if (myRow) myRow.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 50);
+    });
     lbClose.addEventListener('click', () => { lbModal.classList.remove('open'); });
     lbModal.addEventListener('click', (e) => { if (e.target === lbModal) lbModal.classList.remove('open'); });
 
@@ -1617,8 +1658,13 @@
       if (entries.length === 0) {
         lbPodium.innerHTML = '';
         lbList.innerHTML = '<div class="lb-empty">NO SCORES YET</div>';
+        lbMyRank.style.display = 'none';
         return;
       }
+
+      // Find player's rank
+      const myIndex = entries.findIndex(e => e.key === playerKey);
+      const youBadge = '<span class="lb-you-badge">YOU</span>';
 
       // Top 3 podium cards (order: silver, gold, bronze via CSS)
       const medals = ['🥇', '🥈', '🥉'];
@@ -1627,6 +1673,7 @@
       lbPodium.innerHTML = top3.map((e, i) => {
         const isMe = e.key === playerKey;
         return '<div class="lb-podium-card ' + classes[i] + (isMe ? ' lb-me' : '') + '">' +
+          (isMe ? youBadge : '') +
           '<span class="lb-podium-medal">' + medals[i] + '</span>' +
           '<div class="lb-podium-name">' + escapeHtml(e.name) + '</div>' +
           '<div class="lb-podium-score">' + e.score.toLocaleString() + '</div>' +
@@ -1637,17 +1684,32 @@
       const rest = entries.slice(3);
       if (rest.length === 0) {
         lbList.innerHTML = '';
-        return;
+      } else {
+        lbList.innerHTML = rest.map((e, i) => {
+          const isMe = e.key === playerKey;
+          const rank = i + 4;
+          return '<div class="lb-row' + (isMe ? ' lb-me' : '') + '">' +
+            '<span class="lb-rank">' + rank + '</span>' +
+            (isMe ? youBadge : '') +
+            '<span class="lb-name">' + escapeHtml(e.name) + '</span>' +
+            '<span class="lb-score">' + e.score.toLocaleString() + '</span>' +
+            '</div>';
+        }).join('');
       }
-      lbList.innerHTML = rest.map((e, i) => {
-        const isMe = e.key === playerKey;
-        const rank = i + 4;
-        return '<div class="lb-row' + (isMe ? ' lb-me' : '') + '">' +
-          '<span class="lb-rank">' + rank + '</span>' +
-          '<span class="lb-name">' + escapeHtml(e.name) + '</span>' +
-          '<span class="lb-score">' + e.score.toLocaleString() + '</span>' +
-          '</div>';
-      }).join('');
+
+      // Sticky "your rank" bar — always visible at bottom
+      if (myIndex >= 0) {
+        const me = entries[myIndex];
+        const myRank = myIndex + 1;
+        lbMyRank.style.display = 'flex';
+        lbMyRank.innerHTML =
+          '<span class="lb-rank">#' + myRank + '</span>' +
+          '<span class="lb-you-badge">YOU</span>' +
+          '<span class="lb-name">' + escapeHtml(me.name) + '</span>' +
+          '<span class="lb-score">' + me.score.toLocaleString() + '</span>';
+      } else {
+        lbMyRank.style.display = 'none';
+      }
     });
   </script>
 </body>
