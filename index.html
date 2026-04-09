@@ -965,6 +965,19 @@
       color: var(--accent);
     }
 
+    .lb-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.45rem;
+      color: var(--text-dim);
+      opacity: 0.6;
+      white-space: nowrap;
+    }
+
+    .lb-podium-card .lb-time {
+      margin-top: 4px;
+      font-size: 0.4rem;
+    }
+
     .lb-empty {
       font-family: 'Orbitron', monospace;
       font-size: 0.7rem;
@@ -1986,13 +1999,27 @@
       }
     }
 
+    function timeAgo(ts) {
+      if (!ts) return '';
+      const s = Math.floor((Date.now() - ts) / 1000);
+      if (s < 30) return 'just now';
+      if (s < 60) return s + 's ago';
+      const m = Math.floor(s / 60);
+      if (m < 60) return m + 'm ago';
+      const h = Math.floor(m / 60);
+      if (h < 24) return h + 'h ago';
+      const d = Math.floor(h / 24);
+      if (d < 7) return d + 'd ago';
+      return Math.floor(d / 7) + 'w ago';
+    }
+
     // Real-time leaderboard listener (top 25)
     const lbPodium = document.getElementById('lbPodium');
     db.ref('players').orderByChild('score').limitToLast(25).on('value', snap => {
       const entries = [];
       snap.forEach(child => {
         const d = child.val();
-        entries.push({ key: child.key, name: d.name || child.key, score: d.score || 0 });
+        entries.push({ key: child.key, name: d.name || child.key, score: d.score || 0, updatedAt: d.updatedAt || 0 });
       });
       entries.sort((a, b) => b.score - a.score);
 
@@ -2027,6 +2054,7 @@
           '<span class="lb-podium-medal">' + medals[i] + '</span>' +
           '<div class="lb-podium-name">' + escapeHtml(e.name) + '</div>' +
           '<div class="lb-podium-score">' + e.score.toLocaleString() + '</div>' +
+          (e.updatedAt ? '<div class="lb-time">' + timeAgo(e.updatedAt) + '</div>' : '') +
           '</div>';
       }).join('');
 
@@ -2041,6 +2069,7 @@
           return '<div class="lb-row' + (isMe ? ' lb-me' : '') + '">' +
             '<span class="lb-rank">' + rank + '</span>' +
             '<span class="lb-name">' + escapeHtml(e.name) + (isMe ? ' ' + youBadge : '') + '</span>' +
+            (e.updatedAt ? '<span class="lb-time">' + timeAgo(e.updatedAt) + '</span>' : '') +
             '<span class="lb-score">' + e.score.toLocaleString() + '</span>' +
             '</div>';
         }).join('');
