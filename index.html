@@ -988,11 +988,27 @@
       letter-spacing: 0.1em;
       white-space: nowrap;
       padding-right: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .player-tag-name {
       color: var(--accent);
       font-weight: 700;
+    }
+
+    .player-tag-switch {
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s, transform 0.2s;
+      font-size: 0.7rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .player-tag-switch:hover {
+      opacity: 1;
+      transform: rotate(180deg);
     }
 
     /* Desktop leaderboard — must come AFTER all base lb- styles */
@@ -1680,7 +1696,46 @@
     }
 
     function showPlayerTag() {
-      playerTag.innerHTML = playerName ? 'Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span>' : '';
+      if (playerName) {
+        playerTag.innerHTML = 'Playing as <span class="player-tag-name">' + escapeHtml(playerName) + '</span><span class="player-tag-switch" id="switchUserBtn" title="Switch user">&#x21C4;</span>';
+        document.getElementById('switchUserBtn').addEventListener('click', switchUser);
+      } else {
+        playerTag.innerHTML = '';
+      }
+    }
+
+    function switchUser() {
+      // Flush any pending score sync immediately
+      if (playerKey && playerName) {
+        clearTimeout(submitTimer);
+        db.ref('players/' + playerKey).transaction(current => {
+          if (current && count > (current.score || 0)) {
+            current.score = count;
+            current.pin = playerPin;
+            current.updatedAt = firebase.database.ServerValue.TIMESTAMP;
+            return current;
+          }
+          return;
+        });
+        // Detach real-time listener for old player
+        db.ref('players/' + playerKey + '/score').off();
+      }
+      // Clear local state
+      playerName = '';
+      playerPin = '';
+      playerKey = '';
+      localStorage.removeItem('phonkPlayerName');
+      localStorage.removeItem('phonkPlayerPin');
+      playerTag.innerHTML = '';
+      // Reset inputs & errors
+      document.getElementById('nameInput').value = '';
+      document.getElementById('pinInput').value = '';
+      document.getElementById('loginNameInput').value = '';
+      document.getElementById('loginPinInput').value = '';
+      clearWelcomeError(document.getElementById('welcomeError'));
+      clearWelcomeError(document.getElementById('loginError'));
+      // Reopen welcome modal
+      welcomeModal.classList.add('open');
     }
 
     // Show welcome modal on first visit
