@@ -1245,6 +1245,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBODRiMSxiobCcA1y20uLC1DFtRuoOpymA",
@@ -1253,10 +1254,25 @@
       projectId: "phonk-clicker",
       storageBucket: "phonk-clicker.firebasestorage.app",
       messagingSenderId: "645127821319",
-      appId: "1:645127821319:web:36f7a852c23368d3ac32a2"
+      appId: "1:645127821319:web:36f7a852c23368d3ac32a2",
+      measurementId: "G-XXXXXXXXXX"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // Google Analytics — only initialize if measurementId is set
+    let analytics = null;
+    try {
+      if (firebaseConfig.measurementId && firebaseConfig.measurementId !== "G-XXXXXXXXXX") {
+        analytics = firebase.analytics();
+      }
+    } catch (e) {
+      // Analytics not available (ad blocker, etc.) — fail silently
+    }
+    function track(eventName, params) {
+      if (!analytics) return;
+      try { analytics.logEvent(eventName, params || {}); } catch (e) {}
+    }
 
     const counterEl = document.getElementById('counter');
     const btn = document.getElementById('clickBtn');
@@ -1855,6 +1871,7 @@
       // Show dismiss button and reopen welcome modal
       welcomeDismiss.style.display = 'block';
       welcomeModal.classList.add('open');
+      track('switch_user_start');
     }
 
     welcomeDismiss.addEventListener('click', () => {
@@ -1869,6 +1886,7 @@
       welcomeModal.classList.remove('open');
       showPlayerTag();
       listenToOwnScore();
+      track('switch_user_cancelled');
     });
 
     // Show welcome modal on first visit
@@ -1913,6 +1931,7 @@
           welcomeModal.classList.remove('open');
           showPlayerTag();
           listenToOwnScore();
+          track('sign_up', { method: 'pin' });
         }).catch(() => {
           showWelcomeError(errEl, 'Something went wrong!');
         });
@@ -1958,8 +1977,10 @@
           welcomeModal.classList.remove('open');
           showPlayerTag();
           listenToOwnScore();
+          track('login', { method: 'pin' });
         }).catch(() => {
           showWelcomeError(errEl, 'Wrong PIN!');
+          track('login_failed');
         });
       });
     });
@@ -2012,6 +2033,7 @@
         const myRow = lbList.querySelector('.lb-me');
         if (myRow) myRow.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }, 50);
+      track('leaderboard_open', { score: count });
     });
     lbClose.addEventListener('click', () => { lbModal.classList.remove('open'); });
     lbModal.addEventListener('click', (e) => { if (e.target === lbModal) lbModal.classList.remove('open'); });
@@ -2075,7 +2097,12 @@
         const old = prevScores[e.key];
         if (old != null) { // skip first load
           const milestone = getMilestoneCrossed(old, e.score);
-          if (milestone) showToast(e.name, milestone, e.key === playerKey);
+          if (milestone) {
+            showToast(e.name, milestone, e.key === playerKey);
+            if (e.key === playerKey) {
+              track('milestone_reached', { milestone: milestone });
+            }
+          }
         }
         prevScores[e.key] = e.score;
       });
