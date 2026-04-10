@@ -1809,8 +1809,18 @@
       return d.innerHTML;
     }
 
+    // Matches any emoji / pictographic char (middle finger, skulls, poop, etc.)
+    const EMOJI_RE = /\p{Extended_Pictographic}/u;
+    function hasEmoji(str) {
+      return EMOJI_RE.test(str);
+    }
     function sanitizeName(str) {
-      return str.replace(/[<>&"'/]/g, '').trim().substring(0, 16);
+      return str
+        .replace(/[<>&"'/]/g, '')                 // HTML-dangerous chars
+        .replace(/\p{Extended_Pictographic}/gu, '') // strip all emoji
+        .replace(/\p{Cf}/gu, '')                  // strip zero-width / RTL override chars
+        .trim()
+        .substring(0, 16);
     }
 
     function showWelcomeError(el, msg) {
@@ -1900,11 +1910,13 @@
 
     // New player registration
     document.getElementById('welcomeSubmit').addEventListener('click', () => {
-      const name = sanitizeName(document.getElementById('nameInput').value);
+      const rawName = document.getElementById('nameInput').value;
+      const name = sanitizeName(rawName);
       const pin = document.getElementById('pinInput').value;
       const errEl = document.getElementById('welcomeError');
       clearWelcomeError(errEl);
 
+      if (hasEmoji(rawName)) { showWelcomeError(errEl, 'No emoji in usernames!'); return; }
       if (!name) { showWelcomeError(errEl, 'Enter a username!'); return; }
       if (!/^\d{4}$/.test(pin)) { showWelcomeError(errEl, 'PIN must be 4 digits!'); return; }
 
@@ -1940,11 +1952,13 @@
 
     // Sign in (cross-device)
     document.getElementById('loginSubmit').addEventListener('click', () => {
-      const name = sanitizeName(document.getElementById('loginNameInput').value);
+      const rawName = document.getElementById('loginNameInput').value;
+      const name = sanitizeName(rawName);
       const pin = document.getElementById('loginPinInput').value;
       const errEl = document.getElementById('loginError');
       clearWelcomeError(errEl);
 
+      if (hasEmoji(rawName)) { showWelcomeError(errEl, 'No emoji in usernames!'); return; }
       if (!name) { showWelcomeError(errEl, 'Enter your username!'); return; }
       if (!/^\d{4}$/.test(pin)) { showWelcomeError(errEl, 'PIN must be 4 digits!'); return; }
 
