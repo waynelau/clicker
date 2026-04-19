@@ -1862,7 +1862,17 @@
       }, 1200);
     }
 
+    // Rate limit: 50ms = max 20 CPS, well above any legitimate human click rate.
+    // Defends against auto-fire mice, auto-clicker extensions, and DevTools spam
+    // — every code path eventually flows through handleClick.
+    let lastClickAt = 0;
+    const MIN_CLICK_INTERVAL_MS = 50;
+
     function handleClick(e) {
+      const now = performance.now();
+      if (now - lastClickAt < MIN_CLICK_INTERVAL_MS) return;
+      lastClickAt = now;
+
       initAudio();
       const isCrit = Math.random() < 0.12;
       const gained = isCrit ? 10 : 1;
