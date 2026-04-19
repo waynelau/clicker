@@ -236,7 +236,8 @@
       border-color: var(--accent-light);
     }
 
-    .click-btn:active {
+    .click-btn:active,
+    .click-btn.pressed {
       transform: scale(0.92);
       box-shadow:
         0 0 80px var(--accent-glow-s),
@@ -566,24 +567,23 @@
     @media (max-width: 520px) {
       .top-btns { top: 10px; right: 10px; gap: 4px; }
       .top-btns-row { gap: 5px; }
-      .theme-btn, .reset-btn, .lb-btn, .auto-btn {
+      .reset-btn, .lb-btn, .auto-btn {
         font-size: 0.75rem;
         padding: 8px 10px;
         min-width: 0;
       }
-      .theme-btn { min-width: 80px; }
+      .theme-btn, .song-btn { padding: 8px 12px; font-size: 1.1rem; }
     }
 
     .theme-btn {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.15em;
+      font-size: 1.3rem;
+      line-height: 1;
       color: var(--text-dim);
       background: transparent;
       border: 1px solid var(--text-dim);
       border-radius: 8px;
-      padding: 12px 20px;
-      min-width: 110px;
+      padding: 12px 16px;
       text-align: center;
       cursor: pointer;
       transition: color 0.2s, border-color 0.2s;
@@ -637,6 +637,93 @@
     .lb-btn:hover {
       color: var(--accent);
       border-color: var(--accent);
+    }
+
+    /* Song picker (icon-only button + dropdown) */
+    .song-picker {
+      position: relative;
+      display: inline-block;
+    }
+
+    .song-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      line-height: 1;
+      color: var(--text-dim);
+      background: transparent;
+      border: 1px solid var(--text-dim);
+      border-radius: 8px;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .song-btn:hover, .song-btn.open {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .song-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 200px;
+      background: var(--modal-box);
+      border: 1px solid var(--accent-glow-m);
+      border-radius: 10px;
+      padding: 6px;
+      z-index: 80;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow-w);
+    }
+
+    .song-menu.open {
+      display: block;
+    }
+
+    .song-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .song-option:hover {
+      background: var(--accent-glow-w);
+    }
+
+    .song-option.active {
+      color: var(--accent);
+      background: var(--accent-glow-w);
+    }
+
+    .song-option .check {
+      width: 14px;
+      flex-shrink: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .song-option .now-playing {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.6rem;
+      color: var(--combo);
+      letter-spacing: 0.05em;
+      margin-left: 6px;
+      opacity: 0.85;
     }
 
     /* Welcome & Leaderboard modals */
@@ -1292,6 +1379,10 @@
     <div class="top-btns-row">
       <button class="lb-btn" id="lbBtn">🏆 LEADERBOARD</button>
       <button class="auto-btn" id="autoBtn" style="display:none">&#9654; AUTO</button>
+      <div class="song-picker" id="songPicker">
+        <button class="song-btn" id="songBtn" aria-label="Choose song" aria-haspopup="listbox" aria-expanded="false">&#9835;</button>
+        <div class="song-menu" id="songMenu" role="listbox"></div>
+      </div>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
       <button class="reset-btn" id="resetBtn" style="display:none">RESET</button>
     </div>
@@ -1436,78 +1527,162 @@
       }
     }
 
-    // 32-step NO BATIDÃO style sequence
-    // Key: Fm, 130 BPM, progression: Fm → Db → Bbm → C
+    // 32-step sequencer. Each click advances one step.
     let beatStep = 0;
 
-    // Melody — F minor, hypnotic staccato hook following the chord progression
-    const melodyPattern = [
-      // Bar 1: Fm (F Ab C) — punchy descending hook
-      { n: 349.2, d: 0.08 },  // F4
-      { n: 523.3, d: 0.08 },  // C5
-      { n: 415.3, d: 0.12 },  // Ab4
-      { n: 0 },
-      { n: 349.2, d: 0.08 },  // F4
-      { n: 415.3, d: 0.08 },  // Ab4
-      { n: 349.2, d: 0.15 },  // F4
-      { n: 0 },
-      // Bar 2: Db (Db F Ab) — response, higher energy
-      { n: 554.4, d: 0.08 },  // Db5
-      { n: 415.3, d: 0.08 },  // Ab4
-      { n: 349.2, d: 0.12 },  // F4
-      { n: 0 },
-      { n: 415.3, d: 0.08 },  // Ab4
-      { n: 554.4, d: 0.08 },  // Db5
-      { n: 415.3, d: 0.15 },  // Ab4
-      { n: 0 },
-      // Bar 3: Bbm (Bb Db F) — darker, building tension
-      { n: 466.2, d: 0.08 },  // Bb4
-      { n: 349.2, d: 0.08 },  // F4
-      { n: 277.2, d: 0.12 },  // Db4
-      { n: 0 },
-      { n: 349.2, d: 0.08 },  // F4
-      { n: 466.2, d: 0.08 },  // Bb4
-      { n: 349.2, d: 0.15 },  // F4
-      { n: 0 },
-      // Bar 4: C (C E G) — resolve, bright lift
-      { n: 523.3, d: 0.08 },  // C5
-      { n: 392.0, d: 0.08 },  // G4
-      { n: 329.6, d: 0.12 },  // E4
-      { n: 0 },
-      { n: 392.0, d: 0.08 },  // G4
-      { n: 523.3, d: 0.10 },  // C5
-      { n: 392.0, d: 0.15 },  // G4
-      { n: 0 },
+    // ========== SONG LIBRARY ==========
+    const songs = [
+      {
+        id: 'phonk-beat-1',
+        name: 'Phonk Beat 1',
+        // Key: Fm, progression Fm → Db → Bbm → C — Brazilian phonk batidão
+        melody: [
+          { n: 349.2, d: 0.08 }, { n: 523.3, d: 0.08 }, { n: 415.3, d: 0.12 }, { n: 0 },
+          { n: 349.2, d: 0.08 }, { n: 415.3, d: 0.08 }, { n: 349.2, d: 0.15 }, { n: 0 },
+          { n: 554.4, d: 0.08 }, { n: 415.3, d: 0.08 }, { n: 349.2, d: 0.12 }, { n: 0 },
+          { n: 415.3, d: 0.08 }, { n: 554.4, d: 0.08 }, { n: 415.3, d: 0.15 }, { n: 0 },
+          { n: 466.2, d: 0.08 }, { n: 349.2, d: 0.08 }, { n: 277.2, d: 0.12 }, { n: 0 },
+          { n: 349.2, d: 0.08 }, { n: 466.2, d: 0.08 }, { n: 349.2, d: 0.15 }, { n: 0 },
+          { n: 523.3, d: 0.08 }, { n: 392.0, d: 0.08 }, { n: 329.6, d: 0.12 }, { n: 0 },
+          { n: 392.0, d: 0.08 }, { n: 523.3, d: 0.10 }, { n: 392.0, d: 0.15 }, { n: 0 },
+        ],
+        bass: [
+          87.3, 0, 0, 87.3,  0, 87.3, 0, 0,
+          69.3, 0, 0, 69.3,  0, 0, 69.3, 0,
+          58.3, 0, 58.3, 0,  0, 58.3, 0, 0,
+          65.4, 0, 0, 65.4,  0, 0, 65.4, 65.4,
+        ],
+        bassSlide: [
+          7, 0, 0, 4,  0, 5, 0, 0,
+          7, 0, 0, 4,  0, 0, 5, 0,
+          7, 0, 5, 0,  0, 4, 0, 0,
+          5, 0, 0, 4,  0, 0, 5, 8,
+        ],
+        // K=kick, H=hat, C=cowbell, S=snare/clap, O=open hat
+        drums: [
+          'K', 'C', 'H', 'C',  'S', 'C', 'H', 'K',
+          'C', 'H', 'C', 'K',  'S', 'C', 'O', 'C',
+          'K', 'C', 'H', 'C',  'S', 'C', 'K', 'H',
+          'C', 'K', 'C', 'H',  'S', 'C', 'O', 'K',
+        ],
+      },
+      {
+        id: 'phonk-beat-2',
+        name: 'Phonk Beat 2',
+        // Inspired by Montagem Miau — Brazilian funk/phonk (heavy / hypnotic)
+        // Key: Am, progression Am → Dm → G → Am (i-iv-VII-i loop)
+        // Hook: signature "mi-au" two-note descending slide, repeated and hypnotic
+        // Sparse drums, devastating sub bass, the synth IS the hook
+        melody: [
+          // Bar 1: Am — "mi-au _ mi-au-ba-da _" (6-note phrase: miau twice + melodic tag)
+          { n: 880,   d: 0.06 }, { n: 659.3, d: 0.10 }, { n: 0 },              { n: 880,   d: 0.06 },
+          { n: 659.3, d: 0.08 }, { n: 523.3, d: 0.06 }, { n: 880,   d: 0.06 }, { n: 0 },
+          // Bar 2: Dm — same phrase shape, chord-tone shift (A→F instead of A→E)
+          { n: 880,   d: 0.06 }, { n: 698.5, d: 0.10 }, { n: 0 },              { n: 880,   d: 0.06 },
+          { n: 698.5, d: 0.08 }, { n: 587.3, d: 0.06 }, { n: 880,   d: 0.06 }, { n: 0 },
+          // Bar 3: G — phrase lifted up an octave for build (D6→B5→G5 tag)
+          { n: 1174.7, d: 0.06 }, { n: 987.8, d: 0.10 }, { n: 0 },               { n: 1174.7, d: 0.06 },
+          { n: 987.8,  d: 0.08 }, { n: 783.99, d: 0.06 }, { n: 1174.7, d: 0.06 }, { n: 0 },
+          // Bar 4: Am — descending run finale = "drop" payoff
+          { n: 1318.5, d: 0.06 }, { n: 1046.5, d: 0.06 }, { n: 880, d: 0.06 }, { n: 659.3, d: 0.06 },
+          { n: 523.3,  d: 0.06 }, { n: 440,    d: 0.06 }, { n: 329.6, d: 0.10 }, { n: 0 },
+        ],
+        bass: [
+          // Busier syncopated bass — 4 hits per bar, octave drop on offbeats
+          55,   0, 55,   41,   55,   0,    41,   41,   // Am  (A1 ↔ E1)
+          73.4, 0, 73.4, 55,   73.4, 0,    55,   55,   // Dm  (D2 ↔ A1)
+          49,   0, 49,   41,   49,   0,    41,   41,   // G   (G1 ↔ E1)
+          55,   41, 55,  41,   55,   41,   55,   41,   // Am  finale — driving 8-on-the-floor
+        ],
+        bassSlide: [
+          12, 0, 7, 5,   12, 0, 5, 5,
+          12, 0, 7, 5,   12, 0, 5, 5,
+          12, 0, 7, 5,   12, 0, 5, 5,
+          12, 5, 12, 5,  12, 5, 12, 8,
+        ],
+        // Trap drums with progressive build — sparse → driving
+        drums: [
+          'K', 'H', 0,   'H',  'S', 'H', 0,   'H',   // Bar 1: classic boom-clap, sparse
+          'K', 'H', 'K', 'H',  'S', 'H', 0,   'H',   // Bar 2: add a second kick
+          'K', 'H', 0,   'H',  'S', 'H', 'K', 'O',   // Bar 3: open-hat ride into bar 4
+          'K', 'H', 'K', 'K',  'S', 'K', 'H', 'O',   // Bar 4: triplet kick fill + open-hat finale
+        ],
+      },
+      {
+        id: 'phonk-beat-3',
+        name: 'Phonk Beat 3',
+        // Same Miau DNA but UPBEAT — baile funk bounce
+        // Key: Am, brighter progression Am → F → C → G (i-VI-III-VII — the "uplift" loop)
+        // Hook: ascending bouncy arpeggio at 16th-note feel, dense cowbell-driven drums
+        melody: [
+          // Bar 1: Am — bouncy 8-note arpeggio (E A E C A C E A)
+          { n: 659.3, d: 0.06 }, { n: 880,   d: 0.06 }, { n: 659.3, d: 0.06 }, { n: 523.3, d: 0.06 },
+          { n: 440,   d: 0.06 }, { n: 523.3, d: 0.06 }, { n: 659.3, d: 0.06 }, { n: 880,   d: 0.10 },
+          // Bar 2: F — same shape, root walks up (F A F C A C F A)
+          { n: 698.5, d: 0.06 }, { n: 880,   d: 0.06 }, { n: 698.5, d: 0.06 }, { n: 523.3, d: 0.06 },
+          { n: 440,   d: 0.06 }, { n: 523.3, d: 0.06 }, { n: 698.5, d: 0.06 }, { n: 880,   d: 0.10 },
+          // Bar 3: C — peak brightness (G C G E C E G C)
+          { n: 783.99, d: 0.06 }, { n: 1046.5, d: 0.06 }, { n: 783.99, d: 0.06 }, { n: 659.3, d: 0.06 },
+          { n: 523.3,  d: 0.06 }, { n: 659.3,  d: 0.06 }, { n: 783.99, d: 0.06 }, { n: 1046.5, d: 0.10 },
+          // Bar 4: G — turnaround back to Am (D G D B G B D G)
+          { n: 587.3, d: 0.06 }, { n: 783.99, d: 0.06 }, { n: 587.3, d: 0.06 }, { n: 493.9, d: 0.06 },
+          { n: 392,   d: 0.06 }, { n: 493.9,  d: 0.06 }, { n: 587.3, d: 0.06 }, { n: 783.99, d: 0.10 },
+        ],
+        bass: [
+          // Bouncy funk bass — alternating root + octave-up groove
+          110, 55, 110, 55,    110, 55, 110, 55,    // Am  (A2 ↔ A1 8-note bounce)
+          87.3, 43.65, 87.3, 43.65,  87.3, 43.65, 87.3, 43.65,  // F  (F2 ↔ F1)
+          130.8, 65.4, 130.8, 65.4,  130.8, 65.4, 130.8, 65.4,  // C  (C3 ↔ C2)
+          98, 49, 98, 49,      98, 49, 98, 49,      // G  (G2 ↔ G1)
+        ],
+        bassSlide: [
+          5, 0, 5, 0,  5, 0, 5, 0,
+          5, 0, 5, 0,  5, 0, 5, 0,
+          5, 0, 5, 0,  5, 0, 5, 0,
+          5, 0, 5, 0,  5, 0, 5, 8,
+        ],
+        // Dense baile-funk drums — cowbell back in, every beat occupied
+        drums: [
+          'K', 'H', 'C', 'H',  'S', 'H', 'C', 'H',   // Bar 1: classic batidão dance pattern
+          'K', 'C', 'H', 'K',  'S', 'H', 'C', 'H',   // Bar 2: kick variation with cowbell lead
+          'K', 'H', 'C', 'H',  'S', 'C', 'K', 'O',   // Bar 3: open-hat ride lift
+          'K', 'C', 'K', 'H',  'S', 'C', 'K', 'C',   // Bar 4: cowbell-driven funk fill
+        ],
+      },
     ];
 
-    // 808 bass — root notes with heavy slides following Fm → Db → Bbm → C
-    const bassPattern = [
-      // Bar 1: Fm root = F
-      87.3, 0, 0, 87.3,  0, 87.3, 0, 0,
-      // Bar 2: Db root = Db
-      69.3, 0, 0, 69.3,  0, 0, 69.3, 0,
-      // Bar 3: Bbm root = Bb
-      58.3, 0, 58.3, 0,  0, 58.3, 0, 0,
-      // Bar 4: C root = C
-      65.4, 0, 0, 65.4,  0, 0, 65.4, 65.4,
-    ];
+    let currentSongIndex = 0;
+    let randomMode = true; // Default for new users: Random shuffle
+    try {
+      const savedId = localStorage.getItem('phonkSong');
+      if (savedId === 'random') {
+        randomMode = true;
+      } else if (savedId) {
+        const idx = songs.findIndex(s => s.id === savedId);
+        if (idx >= 0) {
+          currentSongIndex = idx;
+          randomMode = false;
+        }
+      }
+    } catch (e) {}
+    // If we're in random mode, kick off with a random song so first launch isn't always Batidão
+    if (randomMode) currentSongIndex = Math.floor(Math.random() * songs.length);
 
-    // Bass slide amount (semitones to glide down from)
-    const bassSlide = [
-      7, 0, 0, 4,  0, 5, 0, 0,
-      7, 0, 0, 4,  0, 0, 5, 0,
-      7, 0, 5, 0,  0, 4, 0, 0,
-      5, 0, 0, 4,  0, 0, 5, 8,
-    ];
+    // Random mode: how many full 32-step loops a song plays before swapping.
+    // Random within a range so the switch doesn't feel mechanical.
+    let loopsThisSong = 0;
+    let loopsUntilSwap = 3 + Math.floor(Math.random() * 3); // 3–5 loops
 
-    // Drum pattern: K=kick, H=hat, C=cowbell, S=snare/clap, O=open hat
-    // Batidão bounce — syncopated with cowbell driving the groove
-    const drumPattern = [
-      'K', 'C', 'H', 'C',  'S', 'C', 'H', 'K',
-      'C', 'H', 'C', 'K',  'S', 'C', 'O', 'C',
-      'K', 'C', 'H', 'C',  'S', 'C', 'K', 'H',
-      'C', 'K', 'C', 'H',  'S', 'C', 'O', 'K',
-    ];
+    function pickNextRandomSong() {
+      if (songs.length <= 1) return;
+      let next;
+      do {
+        next = Math.floor(Math.random() * songs.length);
+      } while (next === currentSongIndex);
+      currentSongIndex = next;
+      loopsThisSong = 0;
+      loopsUntilSwap = 3 + Math.floor(Math.random() * 3);
+    }
 
     function makeDistortionCurve(amount) {
       const curve = new Float32Array(256);
@@ -1688,10 +1863,19 @@
       if (!audioCtx) return;
       const now = audioCtx.currentTime;
       const step = beatStep % 32;
+      // Random mode: count loops; once the song has repeated enough times, swap
+      if (step === 0 && beatStep > 0 && randomMode) {
+        loopsThisSong++;
+        if (loopsThisSong >= loopsUntilSwap) {
+          pickNextRandomSong();
+          if (typeof renderSongMenu === 'function') renderSongMenu();
+        }
+      }
       beatStep++;
+      const song = songs[currentSongIndex];
 
       // Drums
-      const drum = drumPattern[step];
+      const drum = song.drums[step];
       if (drum === 'K') playKick(now);
       else if (drum === 'S') playSnare(now);
       else if (drum === 'H') playHiHat(now, false);
@@ -1699,11 +1883,11 @@
       else if (drum === 'C') playCowbell(now);
 
       // 808 bass with slide
-      const bassFreq = bassPattern[step];
-      if (bassFreq > 0) playBass(now, bassFreq, bassSlide[step]);
+      const bassFreq = song.bass[step];
+      if (bassFreq > 0) playBass(now, bassFreq, song.bassSlide[step]);
 
       // Melody
-      const mel = melodyPattern[step];
+      const mel = song.melody[step];
       if (mel.n > 0) playMelodyNote(now, mel.n, mel.d);
     }
 
@@ -1876,6 +2060,8 @@
       lastClickAt = now;
 
       initAudio();
+      btn.classList.add('pressed');
+      setTimeout(() => btn.classList.remove('pressed'), 120);
       const isCrit = Math.random() < 0.03;
       const gained = isCrit ? 10 : 1;
       const prevCount = count;
@@ -1991,6 +2177,79 @@
       }
     });
 
+    // Song picker
+    const songBtn = document.getElementById('songBtn');
+    const songMenu = document.getElementById('songMenu');
+
+    function renderSongMenu() {
+      // Random option is always first; user-selected indicator is randomMode
+      let html = '<button class="song-option' + (randomMode ? ' active' : '') + '" data-id="random">' +
+        '<span class="check">' + (randomMode ? '\u2713' : '') + '</span>' +
+        '<span>Random</span>' +
+      '</button>';
+      html += songs.map((s, i) => {
+        const isUserChoice = !randomMode && i === currentSongIndex;
+        const isNowPlaying = randomMode && i === currentSongIndex;
+        return '<button class="song-option' + (isUserChoice ? ' active' : '') + '" data-i="' + i + '">' +
+          '<span class="check">' + (isUserChoice ? '\u2713' : '') + '</span>' +
+          '<span>' + s.name + (isNowPlaying ? ' <span class="now-playing">\u25B6 now</span>' : '') + '</span>' +
+        '</button>';
+      }).join('');
+      songMenu.innerHTML = html;
+    }
+    renderSongMenu();
+
+    function closeSongMenu() {
+      songMenu.classList.remove('open');
+      songBtn.classList.remove('open');
+      songBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    songBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = songMenu.classList.contains('open');
+      if (isOpen) {
+        closeSongMenu();
+      } else {
+        songMenu.classList.add('open');
+        songBtn.classList.add('open');
+        songBtn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    songMenu.addEventListener('click', (e) => {
+      const opt = e.target.closest('.song-option');
+      if (!opt) return;
+      if (opt.dataset.id === 'random') {
+        if (!randomMode) {
+          randomMode = true;
+          // Pick a fresh random song so user immediately hears the shuffle take effect
+          pickNextRandomSong();
+          beatStep = 0;
+          try { localStorage.setItem('phonkSong', 'random'); } catch (e) {}
+          renderSongMenu();
+          track('song_change', { song: 'random' });
+        }
+      } else {
+        const i = parseInt(opt.dataset.i, 10);
+        if (randomMode || i !== currentSongIndex) {
+          randomMode = false;
+          currentSongIndex = i;
+          beatStep = 0; // restart so the new song begins from bar 1
+          try { localStorage.setItem('phonkSong', songs[i].id); } catch (e) {}
+          renderSongMenu();
+          track('song_change', { song: songs[i].id });
+        }
+      }
+      closeSongMenu();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!songMenu.classList.contains('open')) return;
+      if (e.target.closest('#songPicker')) return;
+      closeSongMenu();
+    });
+
     // Theme toggle
     const themeBtn = document.getElementById('themeBtn');
     let isLight = localStorage.getItem('phonkTheme') === 'light';
@@ -1998,7 +2257,8 @@
     updateThemeIcon();
 
     function updateThemeIcon() {
-      themeBtn.innerHTML = isLight ? '<span style="font-size:1.1rem">\u263E</span> DARK' : '<span style="font-size:1.1rem">\u2600</span> LIGHT';
+      themeBtn.innerHTML = isLight ? '\u263E' : '\u2600';
+      themeBtn.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
     }
 
     themeBtn.addEventListener('click', () => {
