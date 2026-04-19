@@ -726,6 +726,17 @@
       opacity: 0.85;
     }
 
+    /* Mobile button sizing — must come after base button rules to win specificity */
+    @media (max-width: 520px) {
+      .lb-btn, .reset-btn, .auto-btn,
+      .theme-btn, .song-btn {
+        font-size: 1rem;
+        padding: 10px 14px;
+        line-height: 1;
+      }
+      .lb-btn { letter-spacing: 0.1em; }
+    }
+
     /* Welcome & Leaderboard modals */
     .welcome-modal, .lb-modal {
       display: none;
