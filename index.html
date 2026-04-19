@@ -1874,7 +1874,7 @@
       lastClickAt = now;
 
       initAudio();
-      const isCrit = Math.random() < 0.12;
+      const isCrit = Math.random() < 0.03;
       const gained = isCrit ? 10 : 1;
       const prevCount = count;
       count += gained;
@@ -2313,7 +2313,7 @@
 
     // Real-time leaderboard listener (top 25)
     const lbPodium = document.getElementById('lbPodium');
-    db.ref('players').orderByChild('score').limitToLast(25).on('value', snap => {
+    db.ref('players').orderByChild('score').limitToLast(50).on('value', snap => {
       const entries = [];
       snap.forEach(child => {
         const d = child.val();
