@@ -1704,6 +1704,18 @@
       return curve;
     }
 
+    // Disconnect every node in `nodes` once `source` finishes playing.
+    // Without this, gain/filter/distortion nodes stay rooted to destination
+    // and accumulate over time, slowing the audio thread on long sessions.
+    function cleanupOnEnd(source, nodes) {
+      source.onended = () => {
+        try { source.disconnect(); } catch (e) {}
+        for (const n of nodes) {
+          try { n.disconnect(); } catch (e) {}
+        }
+      };
+    }
+
     function playKick(now) {
       // Punchy batidão kick
       const osc = audioCtx.createOscillator();
@@ -1715,6 +1727,7 @@
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + 0.25);
+      cleanupOnEnd(osc, [gain]);
 
       // Click transient for punch
       const click = audioCtx.createOscillator();
@@ -1726,6 +1739,7 @@
       cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
       click.connect(cGain); cGain.connect(audioCtx.destination);
       click.start(now); click.stop(now + 0.02);
+      cleanupOnEnd(click, [cGain]);
     }
 
     function playSnare(now) {
@@ -1744,6 +1758,7 @@
         nGain.gain.exponentialRampToValueAtTime(0.001, offset + 0.08);
         noise.connect(bp); bp.connect(nGain); nGain.connect(audioCtx.destination);
         noise.start(offset);
+        cleanupOnEnd(noise, [bp, nGain]);
       }
       // Tonal body
       const osc = audioCtx.createOscillator();
@@ -1755,6 +1770,7 @@
       oGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
       osc.connect(oGain); oGain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + 0.08);
+      cleanupOnEnd(osc, [oGain]);
     }
 
     function playHiHat(now, open) {
@@ -1771,6 +1787,7 @@
       gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
       noise.connect(hp); hp.connect(gain); gain.connect(audioCtx.destination);
       noise.start(now);
+      cleanupOnEnd(noise, [hp, gain]);
     }
 
     function playCowbell(now) {
@@ -1787,6 +1804,7 @@
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
         osc.connect(bp); bp.connect(gain); gain.connect(audioCtx.destination);
         osc.start(now); osc.stop(now + 0.06);
+        cleanupOnEnd(osc, [bp, gain]);
       });
       // Extra click transient for attack
       const click = audioCtx.createOscillator();
@@ -1797,6 +1815,7 @@
       cg.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
       click.connect(cg); cg.connect(audioCtx.destination);
       click.start(now); click.stop(now + 0.01);
+      cleanupOnEnd(click, [cg]);
     }
 
     function playBass(now, freq, slide) {
@@ -1817,6 +1836,7 @@
 
       osc.connect(dist); dist.connect(gain); gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + 0.35);
+      cleanupOnEnd(osc, [dist, gain]);
 
       // Sub layer for extra weight
       const sub = audioCtx.createOscillator();
@@ -1827,6 +1847,7 @@
       subG.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
       sub.connect(subG); subG.connect(audioCtx.destination);
       sub.start(now); sub.stop(now + 0.3);
+      cleanupOnEnd(sub, [subG]);
     }
 
     function playMelodyNote(now, freq, dur) {
@@ -1848,6 +1869,7 @@
       osc.connect(dist); dist.connect(filter); filter.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + dur);
+      cleanupOnEnd(osc, [dist, filter, gain]);
 
       // Detuned layer for thickness
       const osc2 = audioCtx.createOscillator();
@@ -1858,6 +1880,7 @@
       g2.gain.exponentialRampToValueAtTime(0.001, now + dur);
       osc2.connect(g2); g2.connect(audioCtx.destination);
       osc2.start(now); osc2.stop(now + dur);
+      cleanupOnEnd(osc2, [g2]);
 
       // Sub octave for weight
       const osc3 = audioCtx.createOscillator();
@@ -1868,6 +1891,7 @@
       g3.gain.exponentialRampToValueAtTime(0.001, now + dur * 0.8);
       osc3.connect(g3); g3.connect(audioCtx.destination);
       osc3.start(now); osc3.stop(now + dur);
+      cleanupOnEnd(osc3, [g3]);
     }
 
     function playPhonkSound() {
