@@ -726,6 +726,148 @@
       opacity: 0.85;
     }
 
+    /* What's New button & modal */
+    .whats-new-btn {
+      position: relative;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      line-height: 1;
+      color: var(--text-dim);
+      background: transparent;
+      border: 1px solid var(--text-dim);
+      border-radius: 8px;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .whats-new-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .whats-new-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 9px;
+      height: 9px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-glow-s);
+    }
+
+    .whats-new-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--modal-bg);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .whats-new-modal.open { display: flex; }
+
+    .wn-box {
+      background: var(--modal-box);
+      border: 1px solid var(--modal-border);
+      border-radius: 20px;
+      padding: 24px 22px;
+      text-align: center;
+      box-shadow: 0 0 80px var(--accent-glow-w);
+      max-width: 420px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .wn-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      margin-bottom: 4px;
+      text-shadow: 0 0 20px var(--accent-glow-s);
+    }
+
+    .wn-subtitle {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.25em;
+      margin-bottom: 20px;
+    }
+
+    .wn-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .wn-entry {
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: var(--accent-glow-w);
+      border-left: 3px solid var(--accent);
+    }
+
+    .wn-date {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      color: var(--combo);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .wn-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+
+    .wn-empty {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 24px 0;
+    }
+
+    .wn-close {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      color: var(--cancel-color);
+      background: transparent;
+      border: 1px solid var(--cancel-border);
+      border-radius: 8px;
+      padding: 10px 24px;
+      margin-top: 18px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .wn-close:hover {
+      color: var(--text);
+      border-color: var(--text-dim);
+    }
+
+    @media (min-width: 600px) {
+      .wn-box { max-width: 540px; padding: 32px 36px; border-width: 2px; border-radius: 20px; }
+      .wn-title { font-size: 2.8rem; }
+      .wn-subtitle { font-size: 0.8rem; margin-bottom: 24px; }
+      .wn-entry { padding: 18px 22px; }
+      .wn-date { font-size: 0.85rem; }
+      .wn-text { font-size: 1.3rem; }
+    }
+
     /* Mobile button sizing — must come after base button rules to win specificity */
     @media (max-width: 520px) {
       .lb-btn, .reset-btn, .auto-btn,
@@ -1394,6 +1536,7 @@
         <button class="song-btn" id="songBtn" aria-label="Choose song" aria-haspopup="listbox" aria-expanded="false">&#9835;</button>
         <div class="song-menu" id="songMenu" role="listbox"></div>
       </div>
+      <button class="whats-new-btn" id="whatsNewBtn" aria-label="What's new">&#10024;<span class="whats-new-dot" id="whatsNewDot" style="display:none"></span></button>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9728; LIGHT</button>
       <button class="reset-btn" id="resetBtn" style="display:none">RESET</button>
     </div>
@@ -1442,6 +1585,15 @@
       <div class="lb-list" id="lbList"></div>
       <div class="lb-my-rank" id="lbMyRank" style="display:none"></div>
       <button class="lb-close" id="lbClose">CLOSE</button>
+    </div>
+  </div>
+
+  <div class="whats-new-modal" id="whatsNewModal">
+    <div class="wn-box">
+      <div class="wn-title">WHAT'S NEW</div>
+      <div class="wn-subtitle">RECENT UPDATES</div>
+      <div class="wn-list" id="whatsNewList"></div>
+      <button class="wn-close" id="whatsNewClose">CLOSE</button>
     </div>
   </div>
 
@@ -2283,6 +2435,67 @@
       if (!songMenu.classList.contains('open')) return;
       if (e.target.closest('#songPicker')) return;
       closeSongMenu();
+    });
+
+    // What's New journal
+    const whatsNewEntries = [
+      { date: '2026-04-18', text: 'Critical clicks: 3% chance per click rewards you with +10 instead of +1, with a fun gold burst.' },
+      { date: '2026-04-18', text: 'New phonk music: 3 different beats with auto-shuffle in the music dropdown.' },
+    ];
+    const whatsNewBtn = document.getElementById('whatsNewBtn');
+    const whatsNewModal = document.getElementById('whatsNewModal');
+    const whatsNewList = document.getElementById('whatsNewList');
+    const whatsNewClose = document.getElementById('whatsNewClose');
+    const whatsNewDot = document.getElementById('whatsNewDot');
+
+    function formatWhatsNewDate(iso) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const [y, m, d] = iso.split('-').map(Number);
+      return months[m - 1] + ' ' + d + ', ' + y;
+    }
+
+    function renderWhatsNew() {
+      if (!whatsNewEntries.length) {
+        whatsNewList.innerHTML = '<div class="wn-empty">NO UPDATES YET</div>';
+        return;
+      }
+      const sorted = [...whatsNewEntries].sort((a, b) => b.date.localeCompare(a.date));
+      whatsNewList.innerHTML = sorted.map(e =>
+        '<div class="wn-entry">' +
+          '<div class="wn-date">' + formatWhatsNewDate(e.date) + '</div>' +
+          '<div class="wn-text">' + escapeHtml(e.text) + '</div>' +
+        '</div>'
+      ).join('');
+    }
+    renderWhatsNew();
+
+    function newestEntryDate() {
+      if (!whatsNewEntries.length) return '';
+      return whatsNewEntries.reduce((a, b) => a.date > b.date ? a : b).date;
+    }
+
+    function refreshWhatsNewDot() {
+      let lastSeen = '';
+      try { lastSeen = localStorage.getItem('whatsNewLastSeen') || ''; } catch (e) {}
+      const newest = newestEntryDate();
+      const hasUnread = newest && newest > lastSeen;
+      whatsNewDot.style.display = hasUnread ? 'block' : 'none';
+    }
+    refreshWhatsNewDot();
+
+    whatsNewBtn.addEventListener('click', () => {
+      whatsNewModal.classList.add('open');
+      try { localStorage.setItem('whatsNewLastSeen', newestEntryDate()); } catch (e) {}
+      refreshWhatsNewDot();
+      track('whats_new_open');
+    });
+
+    whatsNewClose.addEventListener('click', () => {
+      whatsNewModal.classList.remove('open');
+    });
+
+    whatsNewModal.addEventListener('click', (e) => {
+      if (e.target === whatsNewModal) whatsNewModal.classList.remove('open');
     });
 
     // Theme toggle
